@@ -1,0 +1,8 @@
+ELEMENT,Description,Convert,Units_name,Units_sym
+TAVG,Average temperature (tenths of degrees C)  [Note that TAVG from source 'S' corresponds  to an average for the period ending at  2400 UTC rather than local midnight],((0.1*X)*1.8)+32,Fahrenheit,F
+TMIN,Minimum temperature (tenths of degrees C),((0.1*X)*1.8)+32,Fahrenheit,F
+TMAX,Maximum temperature (tenths of degrees C),((0.1*X)*1.8)+32,Fahrenheit,F
+SNOW,Snowfall (mm),(0.1*X)*0.3937008,inches,in
+SNWD,Snow depth (mm),(0.1*X)*0.3937008,inches,in
+PRCP,Precipitation (tenths of mm),(0.01*X)*0.3937008,inches,in
+AWND,Average daily wind speed (tenths of meters per second),(0.1*X)*1.943844,knots,kt

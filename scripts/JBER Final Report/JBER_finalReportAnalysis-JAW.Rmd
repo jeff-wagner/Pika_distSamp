@@ -1,0 +1,434 @@
+---
+title: "2020 JBER Final Report Analysis"
+author: "Jeff Wagner"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Statewide collared pika (*Ochotona collaris*) surveys in Alaska: summary analysis for Joint Base Elmendorf-Richardson
+####Data collected July - Sep 2018 and July - Aug 2019
+####Field team consisted of University of Alaska Anchorage, Alaska Center for Conservation Science (ACCS) personnel: Paul Schuette, Amanda Droghini, Jeff Wagner, Rachel Kelty, Lindsey Taylor, Logan Suiter
+
+```{r}
+rm(list = ls())
+
+library(tidyverse)
+library(readxl)
+library(unmarked)
+library(lubridate)
+library(pivottabler)
+library(doBy)
+library(egg)
+```
+
+###   Part 1: Load the observation data
+
+```{r warning=FALSE}
+#Load all sheets in the workbook
+path <- "./data/2018_and_2019_observation_data.xlsx"
+
+#Load the observation data
+observations <- read_excel(path=path, sheet="Observations")
+head(observations)
+
+observations <- as.data.frame(observations)
+head(observations)
+
+#only include initial visits (no revisits) and let's focus on pika only
+unique(observations$Species)  #Make sure PIKA doesn't have any misspellings and see which species we have data
+
+observations$Species <- observations$Species %>% 
+  recode("MAR" = "HOMA", "MARM" = "HOMA", "CAR" = "HOMA", "PTAR" = "PTARM")
+```
+
+Arrange by site name: want to view the JBER sites. We only have JBER data collected by JW, PS, and Colette Brandt (CB) in here so want to treat this as an 'initial visit' with our complete methods. We will remove the 'revisit' data to other sites for now
+and want to make sure we include our 2019 JBER data:
+```{r}
+observations <- observations %>% 
+  arrange(Site)
+
+observations <- observations %>% 
+  mutate(visit_type = ifelse(Location == "JBER", "i", visit_type))
+```
+
+Sort by visit_type to confirm the other sites listed as revisits; we want to exclude those for now:
+```{r, attr.output='style="max-height: 200px;"'}
+observations %>% 
+  arrange(desc(visit_type))  # yes, only P007 and P008 were revisited so we will exclude those next.
+```
+
+Simplify the data frame by selecting the columns of interest and selecting only the initial surveys (exclude P007 and P008 revisits):
+```{r}
+obs <- observations %>%
+  select(Location, Site, Year, visit_type, Observer, Species, Obs_Type, Freshness, Sample, Color, Count, Audio) %>% 
+  filter(visit_type == 'i')
+```
+
+Subset this list of observations into categories to make things easier to work with later:
+```{r}
+#Pika observations only
+pika.obs <- obs %>% 
+  filter(Species == 'PIKA')
+
+#JBER observations only
+JBER.obs <- obs %>%
+  filter(Location == 'JBER')
+
+#JBER pika observations only
+JBER.pika.obs <- pika.obs %>% 
+  filter(Location == 'JBER')
+```
+
+###   Part 2: JBER Haypile Sample Summary
+##### Here we are interested in how many haypiles we encountered per site and of those, how many contained fresh vegetation (indicative of recent pika activity).
+Filter JBER haypile observations only:
+```{r}
+JBER.haypile.obs <- JBER.pika.obs %>% 
+  filter(Obs_Type == 'haypile')
+```
+
+Cleanup the data - create new column for freshness based on haypile colors:
+```{r}
+JBER.haypile.obs$Freshness <- JBER.haypile.obs$Color %>% 
+  recode("B" = "Old", "G" = "Fresh", "GB" = "Fresh and Old", "NA" = "Old")
+```
+
+Create a pivot table to summarize JBER haypiles:
+```{r}
+pt <- PivotTable$new()
+pt$addData(JBER.haypile.obs)
+pt$addColumnDataGroups("Site")
+pt$addRowDataGroups("Freshness")
+pt$defineCalculation(calculationName = "TotalHaypiles", summariseExpression = "n()")
+pt$evaluatePivot()
+(haypile.pivot <- pt$asDataFrame())
+```
+
+Create a table to calculate summary statistics:
+```{r}
+(haypile.summary <- as.data.frame(t(haypile.pivot[,1:2]), drop=false))
+```
+
+####Summary statistics
+
+Mean number of total haypiles per site:
+```{r}
+std <- function(x) sd(x)/sqrt(length(x))
+
+mean(haypile.summary$Total)
+sd(haypile.summary$Total)
+std(haypile.summary$Total)
+```
+
+Mean number of fresh haypiles per site:
+```{r}
+haypile.summary$Contains_fresh <- haypile.summary$Fresh + haypile.summary$`Fresh and Old`
+
+mean(haypile.summary$Contains_fresh)
+sd(haypile.summary$Contains_fresh)
+std(haypile.summary$Contains_fresh)
+```
+
+Number of haypile samples collected:
+```{r}
+(haypile.samples <- filter(JBER.haypile.obs, Sample == "Y"))
+summaryBy(Obs_Type~Site, data = haypile.samples, FUN = length)
+```
+
+###   Part 3: JBER Fecal Sample Summary
+##### Here we are interested in how many pika fecal samples we encountered per site and of those, how many were fresh (indicative of recent pika activity). It should be noted that since pikas are coprophagic, distinguishing between fresh and old fecal pellets can be difficult.
+Filter JBER fecal observations only - separate out pika observations and observations of all species:
+```{r}
+JBER.fecal.all <- JBER.obs %>% 
+  filter(Obs_Type == 'feces')
+
+JBER.fecal.obs <- JBER.pika.obs %>% 
+  filter(Obs_Type == 'feces')
+```
+
+Clean up the data - rename freshness codes:
+```{r}
+JBER.fecal.obs$Freshness <- JBER.fecal.obs$Freshness %>% 
+  recode("O" = "Old", "F" = "Fresh", "FO" = "Indistinguishable")
+```
+
+Create a pivot table of fecal samples:
+```{r}
+pt <- PivotTable$new()
+pt$addData(JBER.fecal.obs)
+pt$addColumnDataGroups("Site")
+pt$addRowDataGroups("Freshness")
+pt$defineCalculation(calculationName = "TotalFecal", summariseExpression = "n()")
+pt$evaluatePivot()
+cat(pt$getLatex())
+(fecal.pivot <- pt$asDataFrame())
+```
+
+Coerce NA values to 0:
+```{r}
+fecal.pivot[is.na(fecal.pivot)] <- 0
+fecal.pivot
+```
+
+Create a table for summary statistics:
+```{r}
+(fecal.summary <- as.data.frame(t(fecal.pivot[,1:2]), drop=false))
+```
+
+####Summary statistics
+
+Mean number of total pika fecal samples per site:
+```{r}
+mean(fecal.summary$Total)
+sd(fecal.summary$Total)
+std(fecal.summary$Total)
+```
+
+Mean number of fresh pika fecal samples per site:
+```{r}
+mean(fecal.summary$Fresh)
+sd(fecal.summary$Fresh)
+std(fecal.summary$Fresh)
+```
+
+Number of pika fecal samples collected:
+```{r}
+(fecal.samples <- filter(JBER.fecal.obs, Sample == "Y"))
+summaryBy(Obs_Type~Site, data = fecal.samples, FUN = length)
+```
+
+### Part 4: JBER Visual Observation Summary
+
+Filter JBER visual observations only - separate out pika observations and observations of all species:
+```{r}
+JBER.visual.all <- JBER.obs %>% 
+  filter(Obs_Type == 'visual')
+
+JBER.visual.obs <- JBER.pika.obs %>% 
+  filter(Obs_Type == 'visual')
+```
+
+Clean up observation type names:
+```{r}
+JBER.visual.obs$Obs_Type <- JBER.visual.obs$Obs_Type %>% 
+  recode("visual" = "Visual")
+```
+
+Create a pivot table of visual observations for all species:
+```{r}
+pt <- PivotTable$new()
+pt$addData(JBER.visual.all)
+pt$addColumnDataGroups("Site")
+pt$addRowDataGroups("Species")
+pt$defineCalculation(calculationName = "TotalVisual", summariseExpression = "n()")
+pt$evaluatePivot()
+cat(pt$getLatex())
+(visual.pivot <- pt$asDataFrame())
+```
+
+Create a table to calculate summary statistics:
+```{r}
+(visual.summary <- as.data.frame(t(visual.pivot[1:3,1:2]), drop=false))
+```
+####Summary statistics
+Mean number of pika observations per site:
+```{r}
+mean(visual.summary$PIKA)
+sd(visual.summary$PIKA)
+std(visual.summary$PIKA)
+```
+Mean number of AGS observations per site:
+```{r}
+mean(visual.summary$AGS)
+sd(visual.summary$AGS)
+std(visual.summary$AGS)
+```
+
+### Part 5: JBER Haypile Vegetation Summary
+
+Import haypile ID data:
+```{r}
+JBER.haypile.veg <- read_csv("./data/JBERHaypiles2019.csv")
+
+factor(JBER.haypile.veg$functionalGroup)
+```
+Create table summarizing the functional groups:
+```{r}
+(JBER.haypile.freq <- count_(JBER.haypile.veg, 'functionalGroup'))
+```
+
+Get rid of the NA row for samples that couldn't be identified to the funtional group level:
+```{r}
+(JBER.haypile.freq <- slice(JBER.haypile.freq, 1:5))
+
+```
+
+Prepare data for plotting - reorder by frequency:
+```{r}
+colnames(JBER.haypile.freq) <- c("Functional Group", "Frequency")  # change column names
+JBER.haypile.freq <- JBER.haypile.freq[order(JBER.haypile.freq$Frequency), ]  # sort
+JBER.haypile.freq$`Functional Group` <- factor(JBER.haypile.freq$`Functional Group`, levels = JBER.haypile.freq$`Functional Group`)  # to retain the order in plot
+head(JBER.haypile.freq)
+```
+
+Convert to proportions (125 identifiable samples total):
+```{r}
+JBER.haypile.freq$Proportion <- JBER.haypile.freq$Frequency/125
+head(JBER.haypile.freq)
+```
+
+Plot the results:
+```{r}
+theme_set(theme_bw())
+
+ggplot(JBER.haypile.freq, aes(x=JBER.haypile.freq$`Functional Group`, y=Proportion)) + 
+  geom_bar(stat="identity", width=.5) + 
+  labs(title="Haypile Vegetation by Functional Group", 
+       subtitle="2019 JBER Pika Surveys") + 
+  xlab("Functional Group") +
+  ylab("Proportion of Specimens") +
+  theme(axis.text.x = element_text(angle=35, vjust=0.6, size = 10), 
+        axis.title = element_text(size = 15))
+```
+
+### Part 6: Hatcher Pass Comparison
+
+Filter out JBER data from 2019 and Hatcher data from 2018-2019:
+```{r}
+JBER.HP.obs <- obs %>% 
+  filter(Location == 'JBER' & Year == '2019' | Location == 'Hatcher Pass')
+```
+
+Just the pika data:
+```{r}
+JBER.HP.pika.obs <- JBER.HP.obs %>% 
+  filter(Species == 'PIKA')
+```
+
+####Filter out Hatcher Pass data by observation type into separate dataframes:
+Filter Hatcher Pass observations:
+```{r}
+hatcher.obs <- obs %>%
+  filter(Location == 'Hatcher Pass')
+```
+Hatcher Pass pika observations:
+```{r}
+hatcher.pika.obs <- hatcher.obs %>% 
+  filter(Species == 'PIKA')
+```
+Hatcher Pass haypile observations:
+```{r}
+hatcher.haypile.obs <- hatcher.pika.obs %>% 
+  filter(Obs_Type == 'haypile')
+```
+Hatcher Pass fecal observations:
+```{r}
+hatcher.fecal.obs <- hatcher.pika.obs %>% 
+  filter(Obs_Type == 'feces')
+```
+Hatcher Pass visual observations:
+```{r}
+hatcher.visual.obs <- hatcher.pika.obs %>% 
+  filter(Obs_Type == 'visual')
+```
+
+Create summary table for JBER and Hatcher pika observations:
+```{r}
+hatcher.obs.summary <- count_(hatcher.pika.obs, 'Obs_Type')
+JBER.obs.summary <- count_(JBER.pika.obs, 'Obs_Type')
+JBER.hatcher.summary <- merge(JBER.obs.summary, hatcher.obs.summary, by = 'Obs_Type', all = TRUE)
+colnames(JBER.hatcher.summary) <- c("Observation Type", "JBER", "Hatcher Pass")
+```
+
+Keep only the first 4 rows (get rid of NA row) and coerce NA values to 0:
+```{r}
+JBER.hatcher.summary <- slice(JBER.hatcher.summary, 1:4)
+JBER.hatcher.summary[is.na(JBER.hatcher.summary)] <- 0
+JBER.hatcher.summary
+```
+
+Clean up names of observation types:
+```{r}
+JBER.hatcher.summary$`Observation Type` <- JBER.hatcher.summary$`Observation Type` %>% 
+  recode("audio_only" = "Audio Only", "feces" = "Fecal", "haypile" = "Haypile", "visual" = "Visual")
+JBER.hatcher.summary
+```
+
+Divide summary by number of sites in each location, 8 sites in HP (one had no observations) and 2 in JBER:
+```{r}
+(JBER.hatcher.summary <- JBER.hatcher.summary %>% 
+  mutate(JBER/2, `Hatcher Pass`/8))
+```
+
+Clean up column names:
+```{r}
+colnames(JBER.hatcher.summary) <- c("Observation Type", "JBER", "Hatcher Pass", "JBER Obs/site", "Hatcher Pass Obs/site")
+JBER.hatcher.summary
+```
+
+Create a summary table for the number of observations of each species at each site:
+```{r, attr.output='style="max-height: 200px;"'}
+(JB.hatch.summary <- summaryBy(Obs_Type~Location + Site + Species, data=JBER.HP.obs, FUN=length))
+```
+
+Now let's make a summary table for different types of pika observations:
+```{r, attr.output='style="max-height: 200px;"'}
+(JB.hatch.pika.summary <- summaryBy(Obs_Type~Location + Site + Obs_Type, data = JBER.HP.pika.obs, FUN=length))
+```
+
+Get rid of last row (JBER NAs) and audio only observations:
+```{r, attr.output='style="max-height: 200px;"'}
+(JB.hatch.pika.summary <- JB.hatch.pika.summary %>% 
+  slice(1:28) %>% 
+  filter(Obs_Type != 'audio_only'))
+```
+
+####Now we need to add rows for sites that don't have a particular observation type:
+Create list of all sites:
+```{r}
+JBER.HP.sites <- data.frame(unique(JB.hatch.pika.summary$Site), stringsAsFactors = FALSE)
+colnames(JBER.HP.sites) <- c("Site")
+```
+Add row for P300:
+```{r}
+JBER.HP.sites <- rbind(JBER.HP.sites,"P300")
+```
+Add 3 rows for P300 with 0 observations for each type:
+```{r}
+JB.HP.pika.summary <- rbind(JB.hatch.pika.summary, c("Hatcher Pass", "P300", "feces", "0"))
+JB.HP.pika.summary <- rbind(JB.HP.pika.summary, c("Hatcher Pass", "P300", "haypile", "0"))
+JB.HP.pika.summary <- rbind(JB.HP.pika.summary, c("Hatcher Pass", "P300", "visual", "0"))
+#Make length column numeric
+JB.HP.pika.summary$Obs_Type.length <- as.numeric(JB.HP.pika.summary$Obs_Type.length)
+JB.HP.pika.summary
+```
+
+Make summary of mean number of observations of each type by location:
+```{r}
+(JBER.HP.mean.summary <- summaryBy(Obs_Type.length~Obs_Type + Location, data = JB.HP.pika.summary, FUN = c(mean, sd, std)))
+```
+
+Plot results:
+```{r}
+mean.comparison.plot <- ggplot(JBER.HP.mean.summary, aes(x=JBER.HP.mean.summary$Location, y=Obs_Type.length.mean)) + 
+  geom_bar(stat="identity", width=.5) + 
+  facet_wrap(~Obs_Type) +
+  labs(title="Mean # of observations per site by location", 
+       subtitle="2019 JBER Pika Surveys") + 
+  xlab("Location") +
+  ylab("Mean observations / site") +
+  theme(axis.text.x = element_text(angle=35, vjust=0.6, size = 10), 
+        axis.title = element_text(size = 15)) +
+  geom_errorbar(aes(ymin=Obs_Type.length.mean-Obs_Type.length.std, 
+                    ymax=Obs_Type.length.mean+Obs_Type.length.std), width = .2)
+
+mean.comparison.plot
+tag_facet(mean.comparison.plot) +
+  theme(strip.text = element_text(size = 9, color = "black", margin = margin(t=5, b=5)), 
+        strip.background = element_rect(fill = "lightgray"))
+
+```
+
