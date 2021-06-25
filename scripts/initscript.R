@@ -6,7 +6,7 @@
 # Set the working directory to the 'pika_distsamp' folder so we can access both the 
 # 'data' and 'scripts' subfolders
 getwd()
-setwd("/Users/jeff/Library/Mobile Documents/com~apple~CloudDocs/R/pika_distsamp")
+setwd("C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp")
 
 # Load packages -----------------------------------------------------------------
 
