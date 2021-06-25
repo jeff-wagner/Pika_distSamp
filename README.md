@@ -6,5 +6,6 @@ This is an abundance analysis of collared pika *(Ochotona collaris)* at sites ac
 
 * The analysis is organized as follows:
   +  **initscript.R:** Set WD, file paths, and load required packages.
+  +  **Scripts 01.x:** Data management of observations & GPS tracks.
 
 
