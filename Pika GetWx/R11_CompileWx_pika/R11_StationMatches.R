@@ -10,7 +10,7 @@ projNAD83 <- "+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 +y_0=0 
 
 # Install Required Packages
 # Automattically install required packages if necessary
-rqdPkgs <- c('rnoaa','rgeos','rgdal','maptools', 'raster', 'leaflet','stringdist','mapview','sf','sp','dplyr' )     
+rqdPkgs <- c('rnoaa','rgeos','rgdal','maptools', 'raster', 'leaflet','stringdist','mapview','sf','sp','dplyr', 'readr' )     
 a <- which( !rqdPkgs %in% installed.packages()[,1])
 if ( length( a ) > 0 ){
   install.packages( rqdPkgs[ a ] )
@@ -20,7 +20,7 @@ if ( length( a ) > 0 ){
 sapply( rqdPkgs, FUN = function(x){ library( x, character.only = T ) } )
 
 # set working directory  
-setwd( "/Users/jeff/Library/Mobile Documents/com~apple~CloudDocs/R/GetWx/20191220 GetWx/R10_CompileWx" )
+setwd( "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R10_CompileWx" )
 
 # FUNCTION: Apply stringsim function to each item of MatchLs list
 MatchList <- function( MatchStr, MatchLs, Qual = 0.95 ){
@@ -108,4 +108,4 @@ st_crs(WS) <- 4326
 mapview(sites, col.regions = "blue") + mapview(WS, col.regions = "green")
 
 
-write_csv(pika_sites, path = "/Users/jeff/Library/Mobile Documents/com~apple~CloudDocs/R/GetWx/20191220 GetWx/R11_CompileWx_pika/_output/pika_sites_nearestWS_combined.csv")
+write_csv(pika_sites, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/pika_sites_nearestWS_combined.csv")
