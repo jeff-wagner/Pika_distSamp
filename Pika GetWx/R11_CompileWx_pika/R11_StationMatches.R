@@ -43,6 +43,9 @@ NRCSwx <- subset( NRCSwx, is.na(Snow.Depth..in..Start.of.Day.Values) == F )
 nrow( NRCSwx )
 NRCSwx$snwd <- as.numeric( NRCSwx$Snow.Depth..in..Start.of.Day.Values )
 
+# Filter out USGS streamflow stations
+NRCSmeta <- NRCSmeta %>% 
+  filter(ntwk %in% c("SNTL", "SCAN", "SNTLT", "COOP"))
 
 # Load in pika site info
 pika_sites <- read.csv("_data/pika_sites.csv")
