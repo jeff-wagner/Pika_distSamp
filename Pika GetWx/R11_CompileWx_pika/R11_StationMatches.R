@@ -58,6 +58,7 @@ pika_sites <- st_as_sf(pika_sites, coords = c("longitude", "Latitude"))
 st_crs(pika_sites) <- 4326
 
 ACISmeta <- st_as_sf(ACISmeta, coords = c("long", "lat"))
+ACISmeta <- select(ACISmeta, -sids)
 st_crs(ACISmeta) <- 4326
 
 # # Map the pika sites and weather stations
@@ -100,6 +101,7 @@ pika_sites <- pika_sites %>%
          WS.name = WSmeta$site_name[match(WSmeta.id, 1:nrow(WSmeta))],
          WS.source = WSmeta$source[match(WSmeta.id, 1:nrow(WSmeta))],
          WS.geometry = WSmeta$geometry[match(WSmeta.id, 1:nrow(WSmeta))])
+
 
 # Map sites and nearest weather stations
 sites <- select(pika_sites, Site, Location, Year, geometry, WS.ID, WS.name, WS.source)

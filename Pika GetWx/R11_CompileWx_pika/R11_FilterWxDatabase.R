@@ -49,8 +49,17 @@ NRCS_pikaWS <- NRCS_pikaWS %>%
   select(WSmeta.id, WS.ID, WS.name, WS.source)
 
 ACIS_pikaWS <- pika_sites_WS[pika_sites_WS$WS.source %in% "ACIS", ]
+ACIS_pikaWS <- unique(ACIS_pikaWS)
+
+ACIS_pikaWS$WS.geometry <- sub("c\\(", "", ACIS_pikaWS$WS.geometry)
+ACIS_pikaWS$WS.geometry <- sub("\\)", "", ACIS_pikaWS$WS.geometry)
+ACIS_pikaWS$Longitude <- sapply(strsplit(ACIS_pikaWS$WS.geometry, ","), "[", 1)
+ACIS_pikaWS$Latitude <- sapply(strsplit(ACIS_pikaWS$WS.geometry, ", "), "[", 2)
 ACIS_pikaWS <- ACIS_pikaWS %>% 
-  select(WSmeta.id, WS.ID, WS.name, WS.source)
+  select(WSmeta.id, WS.ID, WS.name, WS.source, Latitude, Longitude)
+
+saveRDS(ACIS_pikaWS, file = "../R11_CompileWx_pika/_output/ACIS_pikaWS.rds")
+
 
 # Filter NRCS & ACIS Wx data for stations of interest
 NRCS_pikaWX <- NRCSwx[NRCSwx$siteid %in% NRCS_pikaWS$WS.ID, ]
