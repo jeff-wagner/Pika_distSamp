@@ -47,6 +47,12 @@ NRCSwx$snwd <- as.numeric( NRCSwx$Snow.Depth..in..Start.of.Day.Values )
 NRCSmeta <- NRCSmeta %>% 
   filter(ntwk %in% c("SNTL", "SCAN", "SNTLT", "COOP"))
 
+
+# RUNNING LIST OF STATIONS TO FILTER OUT BASED ON DATA AVAILABILITY -------
+# No Precip: SNTLT:1279 - Nicks Valley
+NRCSmeta <- NRCSmeta %>% 
+  filter(!site_id %in% "SNTLT:1279")
+
 # Load in pika site info
 pika_sites <- read.csv("_data/pika_sites.csv")
 
@@ -58,7 +64,7 @@ pika_sites <- st_as_sf(pika_sites, coords = c("longitude", "Latitude"))
 st_crs(pika_sites) <- 4326
 
 ACISmeta <- st_as_sf(ACISmeta, coords = c("long", "lat"))
-ACISmeta <- select(ACISmeta, -sids)
+ACISmeta <- dplyr::select(ACISmeta, -sids)
 st_crs(ACISmeta) <- 4326
 
 # # Map the pika sites and weather stations
@@ -83,11 +89,11 @@ mapview(pika_sites, col.regions = "blue") + mapview(NRCSmeta, col.regions = "gre
 
 # Create a common list of weather stations
 NRCSmeta <- NRCSmeta %>% 
-  select(ntwk, site_name, site_id, geometry)
+  dplyr::select(ntwk, site_name, site_id, geometry)
 NRCSmeta <- rename(NRCSmeta, source = ntwk)
 
 ACISmeta <- ACISmeta %>% 
-  select(source, name, dbID, geometry)
+  dplyr::select(source, name, dbID, geometry)
 ACISmeta <- rename(ACISmeta, site_name = name, site_id = dbID)
 
 WSmeta <- rbind(NRCSmeta, ACISmeta)
@@ -104,7 +110,7 @@ pika_sites <- pika_sites %>%
 
 
 # Map sites and nearest weather stations
-sites <- select(pika_sites, Site, Location, Year, geometry, WS.ID, WS.name, WS.source)
+sites <- dplyr::select(pika_sites, Site, Location, Year, geometry, WS.ID, WS.name, WS.source)
 WS <- data.frame(nearest.site = pika_sites$Site, WS.ID = pika_sites$WS.ID, WS.name = pika_sites$WS.name,
                  WS.source = pika_sites$WS.source, geometry = pika_sites$WS.geometry)
 WS <- st_as_sf(WS)

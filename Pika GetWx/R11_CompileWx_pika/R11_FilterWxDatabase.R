@@ -45,8 +45,13 @@ WSmeta <- rbind(NRCSmeta, ACISmeta)
 # Create list of NRCS & ACIS Wx stations of interest
 NRCS_pikaWS <- pika_sites_WS[pika_sites_WS$WS.source 
                              %in% c("SCAN", "SNTL", "SNTLT", "OTHER", "COOP", "USGS", "MSNT"), ]
+
+NRCS_pikaWS$WS.geometry <- sub("c\\(", "", NRCS_pikaWS$WS.geometry)
+NRCS_pikaWS$WS.geometry <- sub("\\)", "", NRCS_pikaWS$WS.geometry)
+NRCS_pikaWS$Longitude <- sapply(strsplit(NRCS_pikaWS$WS.geometry, ","), "[", 1)
+NRCS_pikaWS$Latitude <- sapply(strsplit(NRCS_pikaWS$WS.geometry, ", "), "[", 2)
 NRCS_pikaWS <- NRCS_pikaWS %>% 
-  select(WSmeta.id, WS.ID, WS.name, WS.source)
+  select(WSmeta.id, WS.ID, WS.name, WS.source, Latitude, Longitude)
 
 ACIS_pikaWS <- pika_sites_WS[pika_sites_WS$WS.source %in% "ACIS", ]
 ACIS_pikaWS <- unique(ACIS_pikaWS)
@@ -57,9 +62,14 @@ ACIS_pikaWS$Longitude <- sapply(strsplit(ACIS_pikaWS$WS.geometry, ","), "[", 1)
 ACIS_pikaWS$Latitude <- sapply(strsplit(ACIS_pikaWS$WS.geometry, ", "), "[", 2)
 ACIS_pikaWS <- ACIS_pikaWS %>% 
   select(WSmeta.id, WS.ID, WS.name, WS.source, Latitude, Longitude)
+ACIS_pikaWS <- unique(ACIS_pikaWS)
+
+pikaWS <- merge(NRCS_pikaWS, ACIS_pikaWS, all = TRUE)
+
 
 saveRDS(ACIS_pikaWS, file = "../R11_CompileWx_pika/_output/ACIS_pikaWS.rds")
-
+saveRDS(NRCS_pikaWS, file = "../R11_CompileWx_pika/_output/NRCS_pikaWS.rds")
+saveRDS(pikaWS, file = "../R11_CompileWx_pika/_output/pikaWS.rds")
 
 # Filter NRCS & ACIS Wx data for stations of interest
 NRCS_pikaWX <- NRCSwx[NRCSwx$siteid %in% NRCS_pikaWS$WS.ID, ]
