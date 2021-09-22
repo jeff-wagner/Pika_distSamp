@@ -7,8 +7,8 @@ wx_ACISsummer2018 <- read.csv("./wx_data/ACIS/summer2018_ACIS.csv", header = T, 
 wx_ACISwinter2017 <- read.csv("./wx_data/ACIS/winter2017_ACIS.csv", header = T, skip = 2)
 wx_ACISwinter2018 <- read.csv("./wx_data/ACIS/winter2018_ACIS.csv", header = T, skip = 2)
 
-wx_NRCSsummer2017 <- read.table("./wx_data/NRCS/summer2017_NRCS_22sep21.txt", sep = ",", header = T, skip = 60)
-wx_NRCSsummer2018 <- read.table("./wx_data/NRCS/summer2018_NRCS_22sep21.txt", sep = ",", header = T, skip = 60)
+wx_NRCSsummer2017 <- read.table("./wx_data/NRCS/summer2017_NRCS_22sep21.txt", sep = ",", header = T, skip = 59)
+wx_NRCSsummer2018 <- read.table("./wx_data/NRCS/summer2018_NRCS_22sep21.txt", sep = ",", header = T, skip = 59)
 wx_NRCSwinter2017 <- read.table("./wx_data/NRCS/winter2017_NRCS_22sep21.txt", sep = ",", header = T, skip = 60)
 wx_NRCSwinter2018 <- read.table("./wx_data/NRCS/winter2018_NRCS_22sep21.txt", sep = ",", header = T, skip = 60)
 
