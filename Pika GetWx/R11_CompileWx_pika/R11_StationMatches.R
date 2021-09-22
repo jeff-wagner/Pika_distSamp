@@ -52,8 +52,9 @@ NRCSmeta <- NRCSmeta %>%
 # No Precip: SNTLT:1279 - Nicks Valley
 # No Data: SNTL:641 - Frostbite Bottom
 # No Data: SNTLT:768 - Look Eyrie
+# No Precip: SNTL:1268 - Fielding Lake
 NRCSmeta <- NRCSmeta %>% 
-  filter(!site_id %in% c("SNTLT:1279", "SNTL:641", "SNTLT:768"))
+  filter(!site_id %in% c("SNTLT:1279", "SNTL:641", "SNTLT:768", "SNTL:1268"))
 
 # Load in pika site info
 pika_sites <- read.csv("_data/pika_sites.csv")
