@@ -15,18 +15,23 @@ wx_NRCSwinter2018 <- read.table("./wx_data/NRCS/winter2018_NRCS_22sep21.txt", se
 
 # Summarize NRCS data by site -----------------------------------------------
 wx_NRCSsummer2017$Date <- as.numeric(as.Date(wx_NRCSsummer2017$Date))
+wx_NRCSsummer2018$Date <- as.numeric(as.Date(wx_NRCSsummer2018$Date))
+wx_NRCSwinter2017$Date <- as.numeric(as.Date(wx_NRCSwinter2017$Date))
+wx_NRCSwinter2018$Date <- as.numeric(as.Date(wx_NRCSwinter2018$Date))
+
 nrcs <- unique(wx_NRCSsummer2017$Station.Id)
-NRCS_summer2017 <- data.frame(Station.Name =NA, Station.Id = nrcs, 
+
+NRCS_summer2017 <- data.frame(season = "summer", year = "2017", Station.Name =NA, Station.Id = nrcs, 
                               Network.Code = NA,
                               Latitude = NA, Longitude = NA,
                               mean.temp.degF = NA, number.max.temp.days = NA, percent.max.temp.days = NA, total.precip = NA)
 for(i in 1:length(nrcs)){
   a <- subset(wx_NRCSsummer2017, Station.Id == nrcs[i])
   mean.temp <- mean(a$Air.Temperature.Average..degF., na.rm = TRUE)
-  number.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4)
+  number.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4, na.rm = TRUE)
   total.days <- max(wx_NRCSsummer2017$Date) - min(wx_NRCSsummer2017$Date) + 1
-  percent.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4)/total.days
-  total.precip <- sum(a$Precipitation.Increment..in.)
+  percent.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4, na.rm = TRUE)/total.days
+  total.precip <- sum(a$Precipitation.Increment..in., na.rm = TRUE)
   
   NRCS_summer2017[i, "Station.Name"] <- a$Station.Name[i]
   NRCS_summer2017[i, "Network.Code"] <- a$Network.Code[i]
@@ -38,10 +43,90 @@ for(i in 1:length(nrcs)){
   NRCS_summer2017[i, "total.precip"] <- total.precip
 }
 
-NRCS.sites <- st_as_sf(NRCS_summer2017, coords = c("Longitude", "Latitude"))
-st_crs(NRCS.sites) <- 4326
-mapviewOptions(basemaps = "Esri.WorldGrayCanvas", native.crs = TRUE)
-mapview(NRCS.sites)
+NRCS_summer2018 <- data.frame(season = "summer", year = "2018", Station.Name =NA, Station.Id = nrcs, 
+                              Network.Code = NA,
+                              Latitude = NA, Longitude = NA,
+                              mean.temp.degF = NA, number.max.temp.days = NA, percent.max.temp.days = NA, total.precip = NA)
+for(i in 1:length(nrcs)){
+  a <- subset(wx_NRCSsummer2018, Station.Id == nrcs[i])
+  mean.temp <- mean(a$Air.Temperature.Average..degF., na.rm = TRUE)
+  number.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4, na.rm = TRUE)
+  total.days <- max(wx_NRCSsummer2018$Date) - min(wx_NRCSsummer2018$Date) + 1
+  percent.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4, na.rm = TRUE)/total.days
+  total.precip <- sum(a$Precipitation.Increment..in., na.rm = TRUE)
+  
+  NRCS_summer2018[i, "Station.Name"] <- a$Station.Name[i]
+  NRCS_summer2018[i, "Network.Code"] <- a$Network.Code[i]
+  NRCS_summer2018[i, "Latitude"] <- a$Latitude[i]
+  NRCS_summer2018[i, "Longitude"] <- a$Longitude[i]
+  NRCS_summer2018[i, "mean.temp.degF"] <- mean.temp
+  NRCS_summer2018[i, "number.max.temp.days"] <- number.max.temp.days
+  NRCS_summer2018[i, "percent.max.temp.days"] <- percent.max.temp.days
+  NRCS_summer2018[i, "total.precip"] <- total.precip
+}
+
+NRCS_winter2017 <- data.frame(season = "winter", year = "2017", Station.Name =NA, Station.Id = nrcs, 
+                              Network.Code = NA,
+                              Latitude = NA, Longitude = NA,
+                              mean.temp.degF = NA, number.max.temp.days = NA, 
+                              percent.max.temp.days = NA, total.precip = NA,
+                              total.precip.snowadj = NA, mean.snow.depth = NA,
+                              mean.swe = NA)
+for(i in 1:length(nrcs)){
+  a <- subset(wx_NRCSwinter2017, Station.Id == nrcs[i])
+  mean.temp <- mean(a$Air.Temperature.Average..degF., na.rm = TRUE)
+  number.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4, na.rm = TRUE)
+  total.days <- max(wx_NRCSwinter2017$Date) - min(wx_NRCSwinter2017$Date) + 1
+  percent.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4, na.rm = TRUE)/total.days
+  total.precip <- sum(a$Precipitation.Increment..in., na.rm = TRUE)
+  total.precip.snowadj <- sum(a$Precipitation.Increment...Snow.adj..in., na.rm = TRUE)
+  mean.snow.depth <- mean(a$Snow.Depth..in..Start.of.Day.Values, na.rm = TRUE)
+  mean.swe <- mean(a$Snow.Water.Equivalent..in..Start.of.Day.Values, na.rm = TRUE)
+  
+  NRCS_winter2017[i, "Station.Name"] <- a$Station.Name[i]
+  NRCS_winter2017[i, "Network.Code"] <- a$Network.Code[i]
+  NRCS_winter2017[i, "Latitude"] <- a$Latitude[i]
+  NRCS_winter2017[i, "Longitude"] <- a$Longitude[i]
+  NRCS_winter2017[i, "mean.temp.degF"] <- mean.temp
+  NRCS_winter2017[i, "number.max.temp.days"] <- number.max.temp.days
+  NRCS_winter2017[i, "percent.max.temp.days"] <- percent.max.temp.days
+  NRCS_winter2017[i, "total.precip"] <- total.precip
+  NRCS_winter2017[i, "total.precip.snowadj"] <- total.precip.snowadj
+  NRCS_winter2017[i, "mean.snow.depth"] <- mean.snow.depth
+  NRCS_winter2017[i, "mean.swe"] <- mean.swe
+}
+
+NRCS_winter2018 <- data.frame(season = "winter", year = "2018", Station.Name =NA, Station.Id = nrcs, 
+                              Network.Code = NA,
+                              Latitude = NA, Longitude = NA,
+                              mean.temp.degF = NA, number.max.temp.days = NA, 
+                              percent.max.temp.days = NA, total.precip = NA,
+                              total.precip.snowadj = NA, mean.snow.depth = NA,
+                              mean.swe = NA)
+for(i in 1:length(nrcs)){
+  a <- subset(wx_NRCSwinter2018, Station.Id == nrcs[i])
+  mean.temp <- mean(a$Air.Temperature.Average..degF., na.rm = TRUE)
+  number.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4, na.rm = TRUE)
+  total.days <- max(wx_NRCSwinter2017$Date) - min(wx_NRCSwinter2017$Date) + 1
+  percent.max.temp.days <- sum(a$Air.Temperature.Maximum..degF. > 82.4, na.rm = TRUE)/total.days
+  total.precip <- sum(a$Precipitation.Increment..in., na.rm = TRUE)
+  total.precip.snowadj <- sum(a$Precipitation.Increment...Snow.adj..in., na.rm = TRUE)
+  mean.snow.depth <- mean(a$Snow.Depth..in..Start.of.Day.Values, na.rm = TRUE)
+  mean.swe <- mean(a$Snow.Water.Equivalent..in..Start.of.Day.Values, na.rm = TRUE)
+  
+  NRCS_winter2018[i, "Station.Name"] <- a$Station.Name[i]
+  NRCS_winter2018[i, "Network.Code"] <- a$Network.Code[i]
+  NRCS_winter2018[i, "Latitude"] <- a$Latitude[i]
+  NRCS_winter2018[i, "Longitude"] <- a$Longitude[i]
+  NRCS_winter2018[i, "mean.temp.degF"] <- mean.temp
+  NRCS_winter2018[i, "number.max.temp.days"] <- number.max.temp.days
+  NRCS_winter2018[i, "percent.max.temp.days"] <- percent.max.temp.days
+  NRCS_winter2018[i, "total.precip"] <- total.precip
+  NRCS_winter2018[i, "total.precip.snowadj"] <- total.precip.snowadj
+  NRCS_winter2018[i, "mean.snow.depth"] <- mean.snow.depth
+  NRCS_winter2018[i, "mean.swe"] <- mean.swe
+}
+
 
 # Create label for season/year and combine into one database ----------------
 wx_ACISsummer2017$season <- "summer"
@@ -54,23 +139,28 @@ wx_ACISwinter2018$season <- "winter"
 wx_ACISwinter2018$year <- 2018
 
 wx_ACIS <- Reduce(function(x, y) merge(x, y, all=TRUE), 
-       list(wx_ACISsummer2017, wx_ACISsummer2018, wx_ACISwinter2017, wx_ACISwinter2018))
+                  list(wx_ACISsummer2017, wx_ACISsummer2018, wx_ACISwinter2017, wx_ACISwinter2018))
 
-rm(wx_ACISsummer2017, wx_ACISsummer2018, wx_ACISwinter2017, wx_ACISwinter2018)
+rm(wx_ACISsummer2017, wx_ACISsummer2018, wx_ACISwinter2017, wx_ACISwinter2018,
+   wx_NRCSsummer2017, wx_NRCSsummer2018, wx_NRCSwinter2017, wx_NRCSwinter2018)
 
-wx_NRCSsummer2017$season <- "summer"
-wx_NRCSsummer2017$year <- 2017
-wx_NRCSsummer2018$season <- "summer"
-wx_NRCSsummer2018$year <- 2018
-wx_NRCSwinter2017$season <- "winter"
-wx_NRCSwinter2017$year <- 2017
-wx_NRCSwinter2018$season <- "winter"
-wx_NRCSwinter2018$year <- 2018
+# NRCS data already has columns for season & year from previous step
 
 wx_NRCS <- Reduce(function(x, y) merge(x, y, all=TRUE), 
-                  list(wx_NRCSsummer2017, wx_NRCSsummer2018, wx_NRCSwinter2017, wx_NRCSwinter2018))
+                  list(NRCS_summer2017, NRCS_summer2018, NRCS_winter2017, NRCS_winter2018))
 
-rm(wx_NRCSsummer2017, wx_NRCSsummer2018, wx_NRCSwinter2017, wx_NRCSwinter2018)
+rm(NRCS_summer2017, NRCS_summer2018, NRCS_winter2017, NRCS_winter2018, a)
+
+# RUNNING LIST OF STATIONS TO FILTER OUT BASED ON DATA AVAILABILITY -------
+# Filter out from manually downloaded and summarized data
+# No Precip: SNTL:1268 - Fielding Lake
+wx_NRCS <- wx_NRCS %>% 
+  filter(!Station.Id %in% 1268)
+
+
+# NRCS Cleanup ------------------------------------------------------------
+# Snow Adjusted Precip is showing as 0 for Eagle Summit, but this is clearly not correct. Fill with NA.
+wx_NRCS$total.precip.snowadj[c(12,17)] <- NA
 
 # Filter ACIS data for weather stations of interest ----------------------
 ACIS_pikaWS <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/ACIS_pikaWS.rds")
@@ -121,11 +211,11 @@ nearest.WS <- ACIS_pikaWS %>%
          wx_ACIS.geometry = wx_ACIS[wx_ACIS.rownum, 1]$geometry,
          dist_m = as.numeric(st_distance(geometry, wx_ACIS.geometry, by_element = TRUE)))
 
-         ,
-         WS.ID = wx_ACIS$site_id[match(wx_ACIS.id, 1:nrow(wx_ACIS))],
-         WS.name = wx_ACIS$site_name[match(wx_ACIS.id, 1:nrow(wx_ACIS))],
-         WS.source = wx_ACIS$source[match(wx_ACIS.id, 1:nrow(wx_ACIS))],
-         WS.geometry = wx_ACIS$geometry[match(wx_ACIS.id, 1:nrow(wx_ACIS))])
+,
+WS.ID = wx_ACIS$site_id[match(wx_ACIS.id, 1:nrow(wx_ACIS))],
+WS.name = wx_ACIS$site_name[match(wx_ACIS.id, 1:nrow(wx_ACIS))],
+WS.source = wx_ACIS$source[match(wx_ACIS.id, 1:nrow(wx_ACIS))],
+WS.geometry = wx_ACIS$geometry[match(wx_ACIS.id, 1:nrow(wx_ACIS))])
 
 m <- leaflet() %>% 
   addProviderTiles(providers$Esri.WorldImagery) %>%
@@ -147,3 +237,7 @@ m <- m %>%
              color = "red",
              label = nearest.WS$wx_ACIS.name)
 m
+
+NRCS_winter2017 <- data.frame(Station.Name =NA, Station.Id = nrcs, 
+NRCS_winter2017 <- data.frame(Station.Name =NA, Station.Id = nrcs, 
+                              Network.Code = NA,
