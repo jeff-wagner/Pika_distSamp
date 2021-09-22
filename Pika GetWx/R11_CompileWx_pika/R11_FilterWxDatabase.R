@@ -65,6 +65,7 @@ ACIS_pikaWS <- ACIS_pikaWS %>%
 ACIS_pikaWS <- unique(ACIS_pikaWS)
 
 pikaWS <- merge(NRCS_pikaWS, ACIS_pikaWS, all = TRUE)
+pikaWS <- unique(pikaWS)
 
 
 saveRDS(ACIS_pikaWS, file = "../R11_CompileWx_pika/_output/ACIS_pikaWS.rds")

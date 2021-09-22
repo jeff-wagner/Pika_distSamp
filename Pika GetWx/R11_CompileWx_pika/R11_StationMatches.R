@@ -10,7 +10,7 @@ projNAD83 <- "+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 +y_0=0 
 
 # Install Required Packages
 # Automattically install required packages if necessary
-rqdPkgs <- c('rnoaa','rgeos','rgdal','maptools', 'raster', 'leaflet','stringdist','mapview','sf','sp','dplyr', 'readr' )     
+rqdPkgs <- c('rnoaa','rgeos','rgdal','maptools', 'leaflet','stringdist','mapview','sf','sp','dplyr', 'readr' )     
 a <- which( !rqdPkgs %in% installed.packages()[,1])
 if ( length( a ) > 0 ){
   install.packages( rqdPkgs[ a ] )
@@ -116,7 +116,7 @@ WS <- data.frame(nearest.site = pika_sites$Site, WS.ID = pika_sites$WS.ID, WS.na
 WS <- st_as_sf(WS)
 st_crs(WS) <- 4326
 
-mapview(sites, col.regions = "blue") + mapview(WS, col.regions = "green")
+mapView(sites, col.regions = "blue") + mapView(WS, col.regions = "green")
 
 
 write_csv(pika_sites, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/pika_sites_nearestWS_combined.csv")
