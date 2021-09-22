@@ -2,8 +2,8 @@
 # interest for the Collared Pika distance sampling analysis.
 
 # Install Required Packages
-# Automattically install required packages if necessary
-rqdPkgs <- c('rnoaa','rgeos','rgdal','maptools', 'raster', 'leaflet','stringdist','mapview','sf','sp','dplyr', 'readr' )     
+# Automatically install required packages if necessary
+rqdPkgs <- c('rnoaa','rgeos','rgdal','maptools', 'leaflet','stringdist','mapview','sf','sp','dplyr', 'readr' )     
 a <- which( !rqdPkgs %in% installed.packages()[,1])
 if ( length( a ) > 0 ){
   install.packages( rqdPkgs[ a ] )
@@ -70,8 +70,3 @@ pikaWS <- merge(NRCS_pikaWS, ACIS_pikaWS, all = TRUE)
 saveRDS(ACIS_pikaWS, file = "../R11_CompileWx_pika/_output/ACIS_pikaWS.rds")
 saveRDS(NRCS_pikaWS, file = "../R11_CompileWx_pika/_output/NRCS_pikaWS.rds")
 saveRDS(pikaWS, file = "../R11_CompileWx_pika/_output/pikaWS.rds")
-
-# Filter NRCS & ACIS Wx data for stations of interest
-NRCS_pikaWX <- NRCSwx[NRCSwx$siteid %in% NRCS_pikaWS$WS.ID, ]
-
-ACIS_pikaWX <- wx[wx$dbID %in% ACIS_pikaWS$WS.ID, ]
