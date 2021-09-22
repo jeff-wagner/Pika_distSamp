@@ -50,8 +50,10 @@ NRCSmeta <- NRCSmeta %>%
 
 # RUNNING LIST OF STATIONS TO FILTER OUT BASED ON DATA AVAILABILITY -------
 # No Precip: SNTLT:1279 - Nicks Valley
+# No Data: SNTL:641 - Frostbite Bottom
+# No Data: SNTLT:768 - Look Eyrie
 NRCSmeta <- NRCSmeta %>% 
-  filter(!site_id %in% "SNTLT:1279")
+  filter(!site_id %in% c("SNTLT:1279", "SNTL:641", "SNTLT:768"))
 
 # Load in pika site info
 pika_sites <- read.csv("_data/pika_sites.csv")
