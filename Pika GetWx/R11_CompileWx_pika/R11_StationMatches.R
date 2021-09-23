@@ -10,7 +10,7 @@ projNAD83 <- "+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 +y_0=0 
 
 # Install Required Packages
 # Automattically install required packages if necessary
-rqdPkgs <- c('rnoaa','rgeos','rgdal','maptools', 'leaflet','stringdist','mapview','sf','sp','dplyr', 'readr' )     
+rqdPkgs <- c('rnoaa','rgeos','rgdal','maptools', 'leaflet','stringdist','mapview','sf','sp','dplyr', 'readr', 'stringr' )     
 a <- which( !rqdPkgs %in% installed.packages()[,1])
 if ( length( a ) > 0 ){
   install.packages( rqdPkgs[ a ] )
@@ -59,6 +59,13 @@ NRCSmeta <- NRCSmeta %>%
 # Load in pika site info
 pika_sites <- read.csv("_data/pika_sites.csv")
 
+
+# Subset ACIS sid column for first item in each element -------------------
+# We will need this to match with the ACIS wx data later
+sids <- sapply(ACISmeta$sids, "[[", 1)
+sids <- str_sub(sids, 1, nchar(sids)-2)
+ACISmeta$sids <- sids
+
 # Convert to spatial objects
 NRCSmeta <- st_as_sf(NRCSmeta, coords = c("longitude", "latitude"))
 st_crs(NRCSmeta) <- 4326
@@ -67,7 +74,6 @@ pika_sites <- st_as_sf(pika_sites, coords = c("longitude", "Latitude"))
 st_crs(pika_sites) <- 4326
 
 ACISmeta <- st_as_sf(ACISmeta, coords = c("long", "lat"))
-ACISmeta <- dplyr::select(ACISmeta, -sids)
 st_crs(ACISmeta) <- 4326
 
 # # Map the pika sites and weather stations
