@@ -16,7 +16,7 @@ sapply( rqdPkgs, FUN = function(x){ library( x, character.only = T ) } )
 setwd( "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R10_CompileWx" )
 
 # Load base database (ACIS only) with weather data
-load( file = "_output/WxDbase(R10.01).rda" )
+load( file = "_output/WxDbase(R10.01)_singlesids.rda" )
 
 ACISmeta <- meta@data
 

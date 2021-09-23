@@ -66,6 +66,10 @@ sids <- sapply(ACISmeta$sids, "[[", 1)
 sids <- str_sub(sids, 1, nchar(sids)-2)
 ACISmeta$sids <- sids
 
+# Save back to database for future reference
+meta@data <- ACISmeta
+save( list=c("meta", "wx"), file = "_output/WxDbase(R10.01)_singlesids.rda" )
+
 # Convert to spatial objects
 NRCSmeta <- st_as_sf(NRCSmeta, coords = c("longitude", "latitude"))
 st_crs(NRCSmeta) <- 4326
