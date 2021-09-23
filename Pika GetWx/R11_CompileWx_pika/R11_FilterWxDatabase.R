@@ -31,16 +31,8 @@ NRCSwx$snwd <- as.numeric( NRCSwx$Snow.Depth..in..Start.of.Day.Values )
 # Load in pika site & nearest WS info
 pika_sites_WS <- read.csv("../R11_CompileWx_pika/_output/pika_sites_nearestWS_combined.csv")
 
-# Create a common list of weather stations
-NRCSmeta <- NRCSmeta %>% 
-  select(ntwk, site_name, site_id)
-NRCSmeta <- rename(NRCSmeta, source = ntwk)
-
-ACISmeta <- ACISmeta %>% 
-  select(source, name, sids)
-ACISmeta <- rename(ACISmeta, site_name = name, site_id = sids)
-
-WSmeta <- rbind(NRCSmeta, ACISmeta)
+# Load common list of weather stations
+WSmeta <- read.csv("../R11_CompileWx_pika/_output/WSmeta.csv")
 
 # Create list of NRCS & ACIS Wx stations of interest
 NRCS_pikaWS <- pika_sites_WS[pika_sites_WS$WS.source 

@@ -1,10 +1,10 @@
 # set working directory  
-  setwd( "C:/Users/jpskinner/Documents/_Projects/20191220 IM Evaluation/20191220 GetWx/_Functions" )
+  setwd( "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/_Functions" )
 
   alldays <- format( seq( as.POSIXct( "1980-01-01"),
-                          as.POSIXct( "2019-01-01" ), 86400 ), format = "%Y-%m-%d" )
+                          as.POSIXct( "2020-01-01" ), 86400 ), format = "%Y-%m-%d" )
   
-  mth <- expand.grid( 1980:2018, 1:12, stringsAsFactors = F )
+  mth <- expand.grid( 1980:2019, 1:12, stringsAsFactors = F )
   mth <- mth[order(mth$Var1),]
   allmonths <- c()
   for( i in 1:length( mth[,1] ) ){
@@ -13,3 +13,4 @@
   }
   
   save( list = c("alldays","allmonths"), file = "alldays.rda" )
+  

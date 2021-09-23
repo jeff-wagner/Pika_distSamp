@@ -111,7 +111,7 @@ ACISmeta <- rename(ACISmeta, site_name = name, site_id = uid)
 
 WSmeta <- rbind(NRCSmeta, ACISmeta)
 
-write_csv(pika_sites, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/WSmeta.csv")
+write_csv(WSmeta, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/WSmeta.csv")
 
 # Find the nearest weather station for each pika site
 pika_sites <- pika_sites %>%
