@@ -106,8 +106,8 @@ NRCSmeta <- NRCSmeta %>%
 NRCSmeta <- rename(NRCSmeta, source = ntwk)
 
 ACISmeta <- ACISmeta %>% 
-  dplyr::select(source, name, sids, geometry)
-ACISmeta <- rename(ACISmeta, site_name = name, site_id = sids)
+  dplyr::select(source, name, uid, geometry)
+ACISmeta <- rename(ACISmeta, site_name = name, site_id = uid)
 
 WSmeta <- rbind(NRCSmeta, ACISmeta)
 
