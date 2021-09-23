@@ -37,8 +37,8 @@ NRCSmeta <- NRCSmeta %>%
 NRCSmeta <- rename(NRCSmeta, source = ntwk)
 
 ACISmeta <- ACISmeta %>% 
-  select(source, name, dbID)
-ACISmeta <- rename(ACISmeta, site_name = name, site_id = dbID)
+  select(source, name, sids)
+ACISmeta <- rename(ACISmeta, site_name = name, site_id = sids)
 
 WSmeta <- rbind(NRCSmeta, ACISmeta)
 
