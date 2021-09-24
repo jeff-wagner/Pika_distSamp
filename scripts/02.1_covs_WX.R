@@ -181,28 +181,13 @@ st_crs(ACIS_pikaWS) <- 4326
 # Filter NRCS data for weather stations of interest -----------------------
 NRCS_pikaWS <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/NRCS_pikaWS.rds")
 
+# Everything matches here, we are good to go with NRCS.
 
 
+# Filter ACIS data for weather stations of interest -----------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# The manually downloaded data doesn't have the WS id, only name, so we'll have to
+# figure out how to match these up...
 
 # Find the nearest weather station
 nearest.WS <- ACIS_pikaWS %>%
@@ -210,6 +195,13 @@ nearest.WS <- ACIS_pikaWS %>%
          wx_ACIS.name = wx_ACIS[wx_ACIS.rownum,]$Name,
          wx_ACIS.geometry = wx_ACIS[wx_ACIS.rownum, 1]$geometry,
          dist_m = as.numeric(st_distance(geometry, wx_ACIS.geometry, by_element = TRUE)))
+
+# Keep the nearest stations that we have data for
+nearestACIS_pikaWS <- nearest.WS[,6:9]
+  
+# Filter wx data for these stations
+wx_ACIS <- wx_ACIS %>% 
+  filter(Name %in% nearestACIS_pikaWS$wx_ACIS.name)
 
 ,
 WS.ID = wx_ACIS$site_id[match(wx_ACIS.id, 1:nrow(wx_ACIS))],

@@ -11,10 +11,10 @@
     setwd( "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R06_ACIS webservice" )
 
   # load all days / months  
-    load( file = "../_Functions/alldays_2017_2020.rda" )
+    load( file = "../_Functions/alldays.rda" )
     
   # Install Required Packages
-  # Automattically install required packages if necessary
+  # Automatically install required packages if necessary
     rqdPkgs <- c('leaflet','jsonlite' )     
     a <- which( !rqdPkgs %in% installed.packages()[,1])
     if ( length( a ) > 0 ){
@@ -25,10 +25,17 @@
 
   # elements 
     elems <- c("mint","maxt","avgt","pcpn","snow","snwd","13")
+    
 
-  # get all alaska weather stations in ACIS system
+  # Get all AK weather stations in ACIS system
     base_url <- paste0("http://data.rcc-acis.org/StnMeta?state=AK&output=json") 
     mta <- fromJSON(base_url )$meta
+    
+    # Filter for stations of interest
+    ACIS_pikaWS <- readRDS("../R11_CompileWx_pika/_output/ACIS_pikaWS.rds")
+    
+    mta <- mta %>% 
+      filter(uid %in% ACIS_pikaWS$WS.ID)
     
     ACISmeta <- data.frame()
     ACISwx <- data.frame()
@@ -36,7 +43,7 @@
       
     # Get data for current station
       sid <- unlist( strsplit( mta$sids[i][[1]][1], split = " " ) )
-      base_url <- paste0("http://data.rcc-acis.org/StnData?sid=",sid[1],"&sdate=2017-01-01&edate=2020-01-01&elems=",
+      base_url <- paste0("http://data.rcc-acis.org/StnData?sid=",sid[1],"&sdate=1980-01-01&edate=2020-01-01&elems=",
                          paste0(elems, collapse = ","),"&output=json")
       rslt <- fromJSON( base_url )
       
@@ -65,25 +72,7 @@
       }
     }
 
-    # Select variables of interest for this analysis
-    ACISwx <- ACISwx %>% 
-      select(uid, sid, date, maxt, avgt, pcpn)
-    # Filter out stations with missing values
-    missing <- data.frame(uid = ACISwx$uid, sid = ACISwx$sid, 
-                          missing = apply(ACISwx, 1, function(r) any(r %in% "M")))
-    missing <- missing %>% 
-      filter(missing == TRUE)
-    missing.uids <- unique(missing$uid)
-    
-    ACISwx.complete <- ACISwx %>% 
-      filter(!ACISwx$uid %in% missing.uids)
-    
-    unique(ACISwx.complete$uid)
-    
-    ACISmeta.complete <- ACISmeta %>% 
-      filter(!ACISmeta$uid %in% missing.uids)
-    
-    save( list = c("ACISmeta","ACISwx" ), file = "_data/ACIS_Alaska.rda" )
+    save( list = c("ACISmeta","ACISwx" ), file = "../R11_CompileWx_pika/_output/ACISdownload.rda" )
     
     subwx <- subset( ACISwx, snwd != "M" )
     

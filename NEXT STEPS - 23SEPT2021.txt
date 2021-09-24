@@ -1,0 +1,4 @@
+STEP 1: R06.00 - Filter out ACIS stations and WX data with missing values
+STEP 2: Run through the rest of the GetWx scripts to find new nearest WS (all should have data now)
+STEP 3: R11 - Filter the ACIS Wx database for the stations of interest
+STEP 4: 02.1_covs_WX - Summarize data in the same fashion as the NRCS data. 
