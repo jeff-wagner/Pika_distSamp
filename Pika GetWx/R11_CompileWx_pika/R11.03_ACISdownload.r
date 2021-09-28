@@ -11,7 +11,7 @@
     setwd( "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R06_ACIS webservice" )
 
   # load all days / months  
-    load( file = "../_Functions/alldays.rda" )
+    load( file = "../_Functions/alldays_2017_2020.rda" )
     
   # Install Required Packages
   # Automatically install required packages if necessary
@@ -43,7 +43,7 @@
       
     # Get data for current station
       sid <- unlist( strsplit( mta$sids[i][[1]][1], split = " " ) )
-      base_url <- paste0("http://data.rcc-acis.org/StnData?sid=",sid[1],"&sdate=1980-01-01&edate=2020-01-01&elems=",
+      base_url <- paste0("http://data.rcc-acis.org/StnData?sid=",sid[1],"&sdate=2017-01-01&edate=2020-01-01&elems=",
                          paste0(elems, collapse = ","),"&output=json")
       rslt <- fromJSON( base_url )
       
@@ -72,19 +72,19 @@
       }
     }
 
+    # Select variables of interest for this analysis
+    ACISwx <- ACISwx %>% 
+      dplyr::select(-mint, -snow, -snwd, -X13)
+    
+    # Replace trace values (T) with zeros
+    t.replace <- function(x) x = ifelse(x=="T", 0, x)
+    ACISwx <- ACISwx %>% 
+      mutate_at(vars(maxt, avgt, pcpn), t.replace)
+    
+    # Replace missing values (M) with NA
+    m.replace <- function(x) x = ifelse(x=="M", NA, x)
+    ACISwx <- ACISwx %>% 
+      mutate_at(vars(maxt, avgt, pcpn), m.replace)
+    
     save( list = c("ACISmeta","ACISwx" ), file = "../R11_CompileWx_pika/_output/ACISdownload.rda" )
-    
-    subwx <- subset( ACISwx, snwd != "M" )
-    
-    SNWDstns <- unique( subwx$uid ) 
-    
-    subMeta <- ACISmeta[ which( ACISmeta$uid %in% SNWDstns &
-                                  ACISmeta$snwd_Coverage > 90  ), ]
-    
-    nrow( subMeta )
-    
-    # leaflet( data = subMeta ) %>% addCircles( lat = ~
-
-    
-    
     

@@ -43,7 +43,7 @@ NRCS_pikaWS$WS.geometry <- sub("\\)", "", NRCS_pikaWS$WS.geometry)
 NRCS_pikaWS$Longitude <- sapply(strsplit(NRCS_pikaWS$WS.geometry, ","), "[", 1)
 NRCS_pikaWS$Latitude <- sapply(strsplit(NRCS_pikaWS$WS.geometry, ", "), "[", 2)
 NRCS_pikaWS <- NRCS_pikaWS %>% 
-  select(WSmeta.id, WS.ID, WS.name, WS.source, Latitude, Longitude)
+  dplyr::select(WSmeta.id, WS.ID, WS.name, WS.source, Latitude, Longitude)
 
 ACIS_pikaWS <- pika_sites_WS[pika_sites_WS$WS.source %in% "ACIS", ]
 ACIS_pikaWS <- unique(ACIS_pikaWS)
@@ -53,7 +53,7 @@ ACIS_pikaWS$WS.geometry <- sub("\\)", "", ACIS_pikaWS$WS.geometry)
 ACIS_pikaWS$Longitude <- sapply(strsplit(ACIS_pikaWS$WS.geometry, ","), "[", 1)
 ACIS_pikaWS$Latitude <- sapply(strsplit(ACIS_pikaWS$WS.geometry, ", "), "[", 2)
 ACIS_pikaWS <- ACIS_pikaWS %>% 
-  select(WSmeta.id, WS.ID, WS.name, WS.source, Latitude, Longitude)
+  dplyr::select(WSmeta.id, WS.ID, WS.name, WS.source, Latitude, Longitude)
 ACIS_pikaWS <- unique(ACIS_pikaWS)
 
 pikaWS <- merge(NRCS_pikaWS, ACIS_pikaWS, all = TRUE)

@@ -47,15 +47,6 @@ NRCSwx$snwd <- as.numeric( NRCSwx$Snow.Depth..in..Start.of.Day.Values )
 NRCSmeta <- NRCSmeta %>% 
   filter(ntwk %in% c("SNTL", "SCAN", "SNTLT", "COOP"))
 
-
-# RUNNING LIST OF STATIONS TO FILTER OUT BASED ON DATA AVAILABILITY -------
-# No Precip: SNTLT:1279 - Nicks Valley
-# No Data: SNTL:641 - Frostbite Bottom
-# No Data: SNTLT:768 - Look Eyrie
-# No Precip: SNTL:1268 - Fielding Lake
-NRCSmeta <- NRCSmeta %>% 
-  filter(!site_id %in% c("SNTLT:1279", "SNTL:641", "SNTLT:768", "SNTL:1268"))
-
 # Load in pika site info
 pika_sites <- read.csv("_data/pika_sites.csv")
 
@@ -110,6 +101,25 @@ ACISmeta <- ACISmeta %>%
 ACISmeta <- rename(ACISmeta, site_name = name, site_id = uid)
 
 WSmeta <- rbind(NRCSmeta, ACISmeta)
+
+# RUNNING LIST OF STATIONS TO FILTER OUT BASED ON DATA AVAILABILITY -------
+# No Precip: SNTLT:1279 - Nicks Valley
+# No Data: SNTL:641 - Frostbite Bottom
+# No Data: SNTLT:768 - Look Eyrie
+# No Precip: SNTL:1268 - Fielding Lake
+# No Precip: ACIS:20886 - Eielson Visitors Center
+# No Precip: ACIS:83137 - Eielson Visitors Center Alaska
+# No Precip: ACIS:82794 - Toklat Alaska
+# No Precip: ACIS:31878 - Montana Creek DOT
+# No Precip: ACIS:83041 - DENALI VISITOR CENTER ALASKA
+# No Precip: ACIS:83140 - WIGAND ALASKA
+# No Precip: ACIS:83053 - DUNKLE HILLS ALASKA
+# No Precip: ACIS:83031 - STAMPEDE ALASKA
+
+WSmeta <- WSmeta %>%
+  filter(!site_id %in% c("SNTLT:1279", "SNTL:641", "SNTLT:768", "SNTL:1268", 
+                         "20886", "83137", "82794", "31878", "83041", "83140",
+                         "83053", "83031"))
 
 write_csv(WSmeta, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/WSmeta.csv")
 

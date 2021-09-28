@@ -21,7 +21,7 @@
     sapply( rqdPkgs, FUN = function(x){ library( x, character.only = T ) } )
         
   # set working directory  
-    setwd( "/Users/jeff/Library/Mobile Documents/com~apple~CloudDocs/R/GetWx/20191220 GetWx" )
+    setwd( "C:\\Users\\jeffw\\Dropbox\\GitHub\\Pika_distSamp\\Pika GetWx" )
 
     
   # Load NOAA weather data
@@ -41,7 +41,7 @@
     NRCSmeta$SITENAME <- toupper( NRCSmeta$site_name )
     
     # Load ACIS weather data
-    load( file = "R06_ACIS webservice/_data/ACIS_Alaska_20210107.rda" )
+    load( file = "R06_ACIS webservice/_data/ACIS_Alaska.rda" )
     nrow( ACISwx )
     ACISwx <- subset( ACISwx, is.na(snwd) == F & snwd != "M" )
     nrow( ACISwx )

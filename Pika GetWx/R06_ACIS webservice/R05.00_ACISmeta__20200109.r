@@ -68,20 +68,28 @@
     # Select variables of interest for this analysis
     ACISwx <- ACISwx %>% 
       select(uid, sid, date, maxt, avgt, pcpn)
-    # Filter out stations with missing values
-    missing <- data.frame(uid = ACISwx$uid, sid = ACISwx$sid, 
-                          missing = apply(ACISwx, 1, function(r) any(r %in% "M")))
-    missing <- missing %>% 
-      filter(missing == TRUE)
-    missing.uids <- unique(missing$uid)
     
-    ACISwx.complete <- ACISwx %>% 
-      filter(!ACISwx$uid %in% missing.uids)
+    ACISwx <- subset(ACISwx, subset=!(maxt == "M" & avgt == "M" & pcpn == "M"))
     
-    unique(ACISwx.complete$uid)
+    # Replace trace values (T) with zeros
+    t.replace <- function(x) x = ifelse(x=="T", 0, x)
+    ACISwx <- ACISwx %>% 
+      mutate_at(vars(maxt, avgt, pcpn), t.replace)
     
-    ACISmeta.complete <- ACISmeta %>% 
-      filter(!ACISmeta$uid %in% missing.uids)
+    # # Filter out stations with missing values
+    # missing <- data.frame(uid = ACISwx$uid, sid = ACISwx$sid, 
+    #                       missing = apply(ACISwx, 1, function(r) any(r %in% "M")))
+    # missing <- missing %>% 
+    #   filter(missing == TRUE)
+    # missing.uids <- unique(missing$uid)
+    # 
+    # ACISwx.complete <- ACISwx %>% 
+    #   filter(!ACISwx$uid %in% missing.uids)
+    
+    uids.keep <- unique(ACISwx$uid)
+    
+    ACISmeta <- ACISmeta %>% 
+      filter(ACISmeta$uid %in% uids.keep)
     
     save( list = c("ACISmeta","ACISwx" ), file = "_data/ACIS_Alaska.rda" )
     
