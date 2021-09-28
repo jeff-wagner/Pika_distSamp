@@ -65,11 +65,15 @@
       }
     }
 
+    # Make duplicates just in case
+    ACISmeta1 <- ACISmeta
+    ACISwx1 <- ACISwx
+    
     # Select variables of interest for this analysis
     ACISwx <- ACISwx %>% 
       select(uid, sid, date, maxt, avgt, pcpn)
     
-    ACISwx <- subset(ACISwx, subset=!(maxt == "M" & avgt == "M" & pcpn == "M"))
+    # ACISwx <- subset(ACISwx, subset=!(maxt == "M" & avgt == "M" & pcpn == "M"))
     
     # Replace trace values (T) with zeros
     t.replace <- function(x) x = ifelse(x=="T", 0, x)
@@ -86,10 +90,10 @@
     # ACISwx.complete <- ACISwx %>% 
     #   filter(!ACISwx$uid %in% missing.uids)
     
-    uids.keep <- unique(ACISwx$uid)
-    
-    ACISmeta <- ACISmeta %>% 
-      filter(ACISmeta$uid %in% uids.keep)
+    # uids.keep <- unique(ACISwx$uid)
+    # 
+    # ACISmeta <- ACISmeta %>% 
+    #   filter(ACISmeta$uid %in% uids.keep)
     
     save( list = c("ACISmeta","ACISwx" ), file = "_data/ACIS_Alaska.rda" )
     
