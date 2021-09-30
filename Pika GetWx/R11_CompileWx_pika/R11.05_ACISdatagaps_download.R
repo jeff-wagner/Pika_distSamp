@@ -32,7 +32,7 @@
     mta <- fromJSON(base_url )$meta
     
     # Filter for stations of interest
-    ACIS_pikaWS <- readRDS("../R11_CompileWx_pika/_output/ACIS_pikaWS.rds")
+    ACIS_pikaWS <- readRDS("../R11_CompileWx_pika/_output/ACIS_datagap.WS.rds")
     
     mta <- mta %>% 
       filter(uid %in% ACIS_pikaWS$WS.ID)
@@ -87,5 +87,5 @@
       mutate_at(vars(maxt, avgt, pcpn), m.replace)
 
     
-    save( list = c("ACISmeta","ACISwx" ), file = "../R11_CompileWx_pika/_output/ACISdownload.rda" )
+    save( list = c("ACISmeta","ACISwx" ), file = "../R11_CompileWx_pika/_output/ACISdatagaps_download.rda" )
     

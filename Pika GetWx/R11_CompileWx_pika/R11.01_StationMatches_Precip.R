@@ -22,14 +22,6 @@ sapply( rqdPkgs, FUN = function(x){ library( x, character.only = T ) } )
 # set working directory  
 setwd( "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R10_CompileWx" )
 
-# FUNCTION: Apply stringsim function to each item of MatchLs list
-MatchList <- function( MatchStr, MatchLs, Qual = 0.95 ){
-  strdist <- stringsim( MatchStr, MatchLs, method = "jw" )
-  mtch <- which( strdist >= Qual )
-  return( list( idx = mtch,  qual = strdist[ mtch ] ) )
-}
-
-
 # Load base database (ACIS only) with weather data
 load( file = "_output/WxDbase(R10.01).rda" )
 
@@ -95,10 +87,6 @@ sids <- sapply(ACISmeta$sids, "[[", 1)
 sids <- str_sub(sids, 1, nchar(sids)-2)
 ACISmeta$sids <- sids
 
-# Save back to database for future reference
-# meta@data <- ACISmeta
-# save( list=c("meta", "wx"), file = "_output/WxDbase(R10.01)_singlesids.rda" )
-
 # Convert to spatial objects
 NRCSmeta <- st_as_sf(NRCSmeta, coords = c("longitude", "latitude"))
 st_crs(NRCSmeta) <- 4326
@@ -144,23 +132,14 @@ ACISmeta <- rename(ACISmeta, site_name = name, site_id = uid)
 WSmeta <- rbind(NRCSmeta, ACISmeta)
 
 # RUNNING LIST OF STATIONS TO FILTER OUT BASED ON DATA AVAILABILITY -------
-# No Precip: SNTLT:1279 - Nicks Valley
-# No Data: SNTL:641 - Frostbite Bottom
-# No Data: SNTLT:768 - Look Eyrie
-# No Precip: SNTL:1268 - Fielding Lake
-# No Precip: ACIS:20886 - Eielson Visitors Center
-# No Precip: ACIS:83137 - Eielson Visitors Center Alaska
-# No Precip: ACIS:82794 - Toklat Alaska
-# No Precip: ACIS:31878 - Montana Creek DOT
-# No Precip: ACIS:83041 - DENALI VISITOR CENTER ALASKA
-# No Precip: ACIS:83140 - WIGAND ALASKA
-# No Precip: ACIS:83053 - DUNKLE HILLS ALASKA
-# No Precip: ACIS:83031 - STAMPEDE ALASKA
+# ACIS:20857 - Chulitna River
+# SNTLT:1279 - Nicks Valley
+# SNTL:641 - Frostbite Bottom
+# SNTLT:768 - Look Eyrie
+# SNTLT:1264 - Horsepasture Pass
 
-# WSmeta <- WSmeta %>%
-#   filter(!site_id %in% c("SNTLT:1279", "SNTL:641", "SNTLT:768", "SNTL:1268", 
-#                          "20886", "83137", "82794", "31878", "83041", "83140",
-#                          "83053", "83031"))
+WSmeta <- WSmeta %>%
+  filter(!site_id %in% c("20857", "SNTLT:1279", "SNTL:641", "SNTLT:768", "SNTLT:1264"))
 
 # write_csv(WSmeta, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/WSmeta.csv")
 
@@ -174,6 +153,22 @@ pika_sites <- pika_sites %>%
          WS.source = WSmeta$source[match(WSmeta.id, 1:nrow(WSmeta))],
          WS.geometry = WSmeta$geometry[match(WSmeta.id, 1:nrow(WSmeta))])
 
+# Create a new data frame with a row for each site per season
+df1 <- pika_sites %>% 
+  mutate(season = "summer", year = 2017)
+df2 <- pika_sites %>% 
+  mutate(season = "summer", year = 2018)
+df3 <- pika_sites %>% 
+  mutate(season = "winter", year = 2017)
+df4 <- pika_sites %>% 
+  mutate(season = "winter", year = 2018)
+pcpn_ref <- as_tibble(df1) %>% 
+  full_join(as_tibble(df2)) %>% 
+  full_join(as_tibble(df3)) %>% 
+  full_join(as_tibble(df4)) %>% 
+  mutate(type = "pcpn")
+
+saveRDS(pcpn_ref, "../R11_CompileWx_pika/_output/pcpn_ref.rds")
 
 # Map sites and nearest weather stations
 sites <- dplyr::select(pika_sites, Site, Location, Year, geometry, WS.ID, WS.name, WS.source)
