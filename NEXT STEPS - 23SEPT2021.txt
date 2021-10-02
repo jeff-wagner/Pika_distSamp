@@ -53,3 +53,7 @@ P147: SNTL:1094 - Monahan Flat (Temp + Precip, all seasons)
 P601: SNTL:1089 - Tokositna Valley (Precip, all seasons), ACIS:83053 - Dunkle Hills Alaska (temp)
 P604, P605A: SNTL:1055 - Upper Tsaina River (Temp + Precip, all seasons)
 P002, P003, P005, P007, P008, P010A, P152A, P300: ACIS:20778 - Little Su at Hatcher Pass Bridge (temp)
+
+
+Problems (10/2/2021):
+Missing winter precip for MV, P146A, and Polychrome

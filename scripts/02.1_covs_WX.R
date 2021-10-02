@@ -8,6 +8,9 @@ wx_NRCSsummer2018 <- read.table("./wx_data/NRCS/summer2018_NRCS_30sep21.txt", se
 wx_NRCSwinter2017 <- read.table("./wx_data/NRCS/winter2017_NRCS_30sep21.txt", sep = ",", header = T, skip = 60)
 wx_NRCSwinter2018 <- read.table("./wx_data/NRCS/winter2018_NRCS_30sep21.txt", sep = ",", header = T, skip = 60)
 
+wx_NRCSwinter2017_gaps <- read.table("./wx_data/NRCS/winter2017_NRCS_datagaps_precip_29sep21.txt", sep = ",", header = T, skip = 53)
+wx_NRCSwinter2017 <- full_join(wx_NRCSwinter2017, wx_NRCSwinter2017_gaps)
+
 load(file = "../Pika GetWx/R11_CompileWx_pika/_output/ACISdownload.rda")
 
 # Recombine ACIS meta and wx data into a format like the NRCS data
@@ -86,6 +89,7 @@ for(i in 1:length(nrcs)){
   NRCS_summer2017[i, "total.precip"] <- total.precip
 }
 
+nrcs <- unique(wx_NRCSsummer2018$Station.Id)
 NRCS_summer2018 <- data.frame(season = "summer", year = "2018", Station.Name =NA, Station.Id = nrcs, 
                               Network.Code = NA,
                               Latitude = NA, Longitude = NA,
@@ -108,6 +112,7 @@ for(i in 1:length(nrcs)){
   NRCS_summer2018[i, "total.precip"] <- total.precip
 }
 
+nrcs <- unique(wx_NRCSwinter2017$Station.Id)
 NRCS_winter2017 <- data.frame(season = "winter", year = "2017", Station.Name =NA, Station.Id = nrcs, 
                               Network.Code = NA,
                               Latitude = NA, Longitude = NA,
@@ -139,6 +144,7 @@ for(i in 1:length(nrcs)){
   NRCS_winter2017[i, "mean.swe"] <- mean.swe
 }
 
+nrcs <- unique(wx_NRCSwinter2018$Station.Id)
 NRCS_winter2018 <- data.frame(season = "winter", year = "2018", Station.Name =NA, Station.Id = nrcs, 
                               Network.Code = NA,
                               Latitude = NA, Longitude = NA,
@@ -403,15 +409,72 @@ temp_ref <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/temp_ref.rds")
 gap_ref <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/datagap.WS.rds")
 
 ref <- full_join(pcpn_ref, temp_ref)
+ref$label <- "original"
 
-wx_forjoin <- wx %>% 
-  select(-Latitude, -Longitude)
-ref_forjoin <- WS_ref %>% 
-  select(Site, Location, Year, WS.ID, WS.name, WS.source, season, year, type) %>% 
-  mutate(WS.ID = as.numeric(gsub("[^0-9.-]", "", WS.ID)))
+gap_ref$label <- "new"
+ref <- full_join(ref, select(gap_ref, -Latitude, - Longitude))
 
-wx_ref <- left_join(wx_forjoin, WS_ref_forjoin, 
-                    by = c("Station.Name" = "WS.name",
-                           "Station.Id" = "WS.ID",
-                           "Network.Code" = "WS.source"))
+overwrite <- ref %>% 
+  filter(Site %in% gap_ref$Site &
+         season %in% gap_ref$season &
+         year %in% gap_ref$year &
+         type %in% gap_ref$type, label == "original")
+
+library(plyr)
+overwrite <- match_df(ref, gap_ref, on = c("Site", "season", "year", "type")) %>% 
+  filter(label == "original")
+detach("package:plyr")
+
+ref <- anti_join(ref, overwrite)
+
+# Now, filter for seasons that we need for each site. Need summer & winter data 
+# from the year that preceded the survey
+reps <- 1:length(ref$Site)
+df <- data.frame(rownum = reps, result = NA)
+
+for(i in 1:length(reps)){
+  a <- subset(ref, as.numeric(row.names(ref)) == reps[i])
+  survey.year <- a$Year
+  wx.year <- a$year
+  if(wx.year == survey.year-1){
+    df[i, "result"] <- "keep"
+  }else{
+    df[i, "result"] <- "toss"
+  } 
+}
+
+ref <- merge(ref, df, by = 0) %>% 
+  filter(result == "keep") %>% 
+  select(Site, Location, Year, dist.WS, WS.ID, WS.name, WS.source, season, year, type)
+
+wx$year <- as.numeric(wx$year)
+
+wx.data <- left_join(ref, wx, by = c("WS.name" = "Station.Name", "season" = "season", "year" = "year")) %>% 
+  select(Site, Location, Year, dist.WS, season, year, type, total.precip, mean.temp.degF, 
+         number.max.temp.days, percent.max.temp.days)
+
+wx.data$total.precip <- ifelse(wx.data$type == "temp", NA, wx.data$total.precip)
+wx.data$mean.temp.degF <- ifelse(wx.data$type == "pcpn", NA, wx.data$mean.temp.degF)
+wx.data$number.max.temp.days <- ifelse(wx.data$type == "pcpn", NA, wx.data$number.max.temp.days)
+wx.data$percent.max.temp.days <- ifelse(wx.data$type == "pcpn", NA, wx.data$percent.max.temp.days)
+wx.data$number.max.temp.days <- ifelse(wx.data$season == "winter", NA, wx.data$number.max.temp.days)
+wx.data$percent.max.temp.days <- ifelse(wx.data$season == "winter", NA, wx.data$percent.max.temp.days)
+
+summer.temp <- wx.data %>% 
+  filter(season == "summer", type == "temp") %>% 
+  select(Site, Location, Year, year, "mean.summer.temp" = mean.temp.degF, number.max.temp.days, percent.max.temp.days)
+winter.temp <- wx.data %>% 
+  filter(season == "winter", type == "temp") %>% 
+  select(Site, Location, Year, year, "mean.winter.temp" = mean.temp.degF)
+summer.pcpn <- wx.data %>% 
+  filter(season == "summer", type == "pcpn") %>% 
+  select(Site, Location, Year, year, "summer.pcpn" = total.precip)
+winter.pcpn <- wx.data %>% 
+  filter(season == "winter", type == "pcpn") %>% 
+  select(Site, Location, Year, year, "winter.pcpn" = total.precip)
+
+wx.data <- summer.temp %>% 
+  left_join(winter.temp) %>% 
+  left_join(summer.pcpn) %>% 
+  left_join(winter.pcpn)
 

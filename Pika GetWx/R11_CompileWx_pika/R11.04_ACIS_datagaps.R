@@ -139,10 +139,10 @@ pika_sites <- pika_sites %>%
          WS.source = WSmeta$source[match(WSmeta.id, 1:nrow(WSmeta))],
          WS.geometry = WSmeta$geometry[match(WSmeta.id, 1:nrow(WSmeta))])
 
-# Looking for sites P133, P135, P138 & P619
-# Next nearest sites with data are ACIS:35068 - Clear Sky (P133 & P135) and
-# ACIS:83140 - Wigand Alaska (P138 & P619); save this in a new df
-summer2018_temp.sites <- as.data.frame(pika_sites[pika_sites$WS.ID %in% c("83140", "35068"),])
+# Looking for site P619
+# Next nearest sites with data is ACIS:83140 - Wigand Alaska; save this in a new df
+summer2018_temp.sites <- as.data.frame(pika_sites[pika_sites$WS.ID %in% c("83140"),]) %>% 
+  filter(Year == 2019)
 summer2018_temp.sites$season <- "summer"
 summer2018_temp.sites$year <- 2018
 summer2018_temp.sites$type <- "temp"
@@ -154,15 +154,15 @@ load( file = "_output/WxDbase(R10.01).rda" )
 ACISmeta <- meta@data
 
 # Select variables and filter for dates of interest
-wx <- wx %>% 
-  mutate(date = as.Date(date)) %>% 
-  dplyr::select(-pcpn) %>% 
+wx <- wx %>%
+  mutate(date = as.Date(date)) %>%
+  dplyr::select(-pcpn) %>%
   filter(date >= "2017-12-01" & date <= "2018-03-31")
 
 # Recode missing values "M" as NAs
 m.replace <- function(x) x = ifelse(x=="M", NA, x)
-wx <- wx %>% 
-  mutate_at(vars(maxt, avgt), m.replace) %>% 
+wx <- wx %>%
+  mutate_at(vars(maxt, avgt), m.replace) %>%
   mutate(maxt = as.numeric(maxt), avgt = as.numeric(avgt))
 
 uids <- unique(wx$uid)
@@ -178,11 +178,11 @@ for(i in 1:length(uids)){
     df[i, "result"] <- "toss"
   }else{
     df[i, "result"] <- "keep"
-  } 
+  }
 }
 
 wx <- left_join(wx, df, by = "uid")
-wx <- wx %>% 
+wx <- wx %>%
   filter(result == "keep")
 
 summary(wx)
@@ -195,11 +195,11 @@ nrow( NRCSwx )
 NRCSwx$snwd <- as.numeric( NRCSwx$Snow.Depth..in..Start.of.Day.Values )
 
 # Filter out USGS streamflow stations
-NRCSmeta <- NRCSmeta %>% 
+NRCSmeta <- NRCSmeta %>%
   filter(ntwk %in% c("SNTL", "SCAN", "SNTLT", "COOP"))
 
 # Get rid of ACIS sids column
-ACISmeta <- ACISmeta %>% 
+ACISmeta <- ACISmeta %>%
   dplyr::select(-sids)
 
 # Load in pika site info
@@ -216,14 +216,14 @@ ACISmeta <- st_as_sf(ACISmeta, coords = c("long", "lat"))
 st_crs(ACISmeta) <- 4326
 
 # Create a common list of weather stations
-NRCSmeta <- NRCSmeta %>% 
+NRCSmeta <- NRCSmeta %>%
   dplyr::select(ntwk, site_name, site_id, geometry)
 NRCSmeta <- rename(NRCSmeta, source = ntwk)
 
 # Filter for only stations we want to keep
 uids <- unique(wx$uid)
-ACISmeta <- ACISmeta %>% 
-  dplyr::select(source, name, uid, geometry) %>% 
+ACISmeta <- ACISmeta %>%
+  dplyr::select(source, name, uid, geometry) %>%
   filter(uid %in% uids)
 ACISmeta <- rename(ACISmeta, site_name = name, site_id = uid)
 
@@ -248,7 +248,8 @@ pika_sites <- pika_sites %>%
 # Looking for sites P100 & P618
 # Next nearest sites with data are SNTL:1268 - Fielding Lake (P100) and
 # ACIS:65770 - Paxson Alaska (P618); save this in a new df
-winter2017_temp.sites <- as.data.frame(pika_sites[pika_sites$WS.ID == "65770" | pika_sites$Site == "P100",])
+winter2017_temp.sites <- as.data.frame(pika_sites[pika_sites$WS.ID == "65770" | pika_sites$Site == "P100",]) %>% 
+  filter(Year == 2018)
 winter2017_temp.sites$season <- "winter"
 winter2017_temp.sites$year <- 2017
 winter2017_temp.sites$type <- "temp"
@@ -351,10 +352,10 @@ pika_sites <- pika_sites %>%
          WS.source = WSmeta$source[match(WSmeta.id, 1:nrow(WSmeta))],
          WS.geometry = WSmeta$geometry[match(WSmeta.id, 1:nrow(WSmeta))])
 
-# Looking for sites P133, P135, P138, and P619 
-# Next nearest sites with data is ACIS:35068 - Clear Sky (P133 & P135) and 
-# ACIS:83140  - Wigand Alaska (P138 & P619), save this in a new df
-winter2018_temp.sites <- as.data.frame(pika_sites[pika_sites$WS.ID == "35068" | pika_sites$WS.ID == "83140",])
+# Looking for site P619 
+# Next nearest site with data is ACIS:83140  - Wigand Alaska, save this in a new df
+winter2018_temp.sites <- as.data.frame(pika_sites[pika_sites$WS.ID == "83140",]) %>% 
+  filter(Year == 2019)
 winter2018_temp.sites$season <- "winter"
 winter2018_temp.sites$year <- 2018
 winter2018_temp.sites$type <- "temp"
@@ -464,7 +465,9 @@ pika_sites <- pika_sites %>%
 # Looking for sites MV, P100, P146A, P618 & Polychrome
 # Next nearest sites with data are SNTL:1072 - Kantishna (MV, P146A & Polychrome), 
 # SNTL:1268 - Fielding Lake (P100 & P618); safe as new df
-winter2017_pcpn.sites <- as.data.frame(pika_sites[pika_sites$Site %in% c("MV", "P100", "P146A", "P618", "Polychrome"),])
+winter2017_pcpn.sites <- as.data.frame(pika_sites[pika_sites$Site %in% 
+                                                    c("MV", "P100", "P146A", "P618", "Polychrome"),]) %>% 
+  filter(Year == 2018)
 winter2017_pcpn.sites$season <- "winter"
 winter2017_pcpn.sites$year <- 2017
 winter2017_pcpn.sites$type <- "pcpn"
