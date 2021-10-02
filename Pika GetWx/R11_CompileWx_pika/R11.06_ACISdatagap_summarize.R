@@ -75,7 +75,7 @@ for(i in 1:length(ACIS_temp)){
   mean.temp <- mean(a$avgt, na.rm = TRUE)
   number.max.temp.days <- sum(a$maxt > 82.4, na.rm = TRUE)
   total.days <- max(temp_ACISsummer2018$Date) - min(temp_ACISsummer2018$Date) + 1
-  percent.max.temp.days <- format(sum(a$maxt. > 82.4, na.rm = TRUE)/total.days, nsmall = 5)
+  percent.max.temp.days <- number.max.temp.days/total.days*100
   
   ACIS_summer2018_temp[i, "Station.Name"] <- a$Station.Name[i]
   ACIS_summer2018_temp[i, "Network.Code"] <- a$Network.Code[i]
@@ -95,7 +95,7 @@ for(i in 1:length(ACIS_temp)){
   mean.temp <- mean(a$avgt, na.rm = TRUE)
   number.max.temp.days <- sum(a$maxt > 82.4, na.rm = TRUE)
   total.days <- max(temp_ACISwinter2017$Date) - min(temp_ACISwinter2017$Date) + 1
-  percent.max.temp.days <- format(sum(a$maxt. > 82.4, na.rm = TRUE)/total.days, nsmall = 5)
+  percent.max.temp.days <- number.max.temp.days/total.days*100
   total.precip <- sum(a$pcpn, na.rm = TRUE)
   
   ACIS_winter2017_temp[i, "Station.Name"] <- a$Station.Name[i]
@@ -116,7 +116,7 @@ for(i in 1:length(ACIS_temp)){
   mean.temp <- mean(a$avgt, na.rm = TRUE)
   number.max.temp.days <- sum(a$maxt > 82.4, na.rm = TRUE)
   total.days <- max(temp_ACISwinter2018$Date) - min(temp_ACISwinter2018$Date) + 1
-  percent.max.temp.days <- format(sum(a$maxt. > 82.4, na.rm = TRUE)/total.days, nsmall = 5)
+  percent.max.temp.days <- number.max.temp.days/total.days*100
   total.precip <- sum(a$pcpn, na.rm = TRUE)
   
   ACIS_winter2018_temp[i, "Station.Name"] <- a$Station.Name[i]
