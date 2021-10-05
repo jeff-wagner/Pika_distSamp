@@ -89,20 +89,26 @@ site.summary <- left_join(site.summary, dist.road, by = 'Site')
 
 head(site.summary)
 
-# Part 3: Add new covariates for mean seasonal temperature from nearest weather station  -----------------------
-# The legwork for this was done in the '02_covs_SNOTEL.r' script. We will read it in here and join it with our 
+# Part 3: Add weather covariates -----------------------
+# Mean summer temperature (Jun-Aug, from preceding year)
+# Number of days where max temperature exceeded a threshold (27ºC, from American pika literature)
+# Mean winter temperature (Dec-Mar, from preceding year)
+# Cumulative precipitation for summer (Jun-Aug, from season preceding survey)
+# Cumulative precipitation for winter (Dec-Mar, from season preceding survey)
+#
+# The legwork for this was done in the '02_covs_WX.r' script. We will read it in here and join it with our
 # working covariate dataframe.
-source("./scripts/02.1_covs_SNOTEL.r")
+source("./scripts/02.1_covs_wx.r")
 
 # Select columns of interest from snotel.cov data (we just need the site, summerTemp, and winterTemp)
-snotel <- snotel.cov %>% 
-  select(Site, summerTemp, winterTemp, TTD) %>% 
-  as.data.frame() %>% #Convert from spatial object back to dataframe and drop the geometry
-  select(-geometry) 
+wx <- wx.data %>% 
+  select(Site, mean.summer.temp, mean.winter.temp, percent.max.temp.days, summer.pcpn, winter.pcpn)
 
 # Join with site.summary
-site.summary <- left_join(site.summary, snotel, by = 'Site')
+site.summary <- left_join(site.summary, wx, by = 'Site')
 
+head(site.summary)
+summary(site.summary)
 # Part 4: Load the site-level (250m radius) data from the Site Info workbook   -------------------------------
 # The variables in this worksheet are at the site level (250m radius). The worksheet is called '250mCover' in 
 # the '2018_and_2019_SiteInfo.xlsx' workbook.
@@ -225,8 +231,9 @@ dim(transect.covs)  #transect covs is 47 rows.
 # for identifying Observers 1, 2, 3, 4. 
 transect.covs <- transect.covs %>% 
   gather(obs1.4, Observer, -Site, -lowshrub, -talus, -Location, -latitude, -longitude, 
-         -slope, -aspect, -elevation, -roughness, -Year, - tempc, -windms, -day.of.year, -eds, -dist.road, -summerTemp,
-         -winterTemp, -TTD) #Yep, 188 rows.
+         -slope, -aspect, -elevation, -roughness, -Year, - tempc, -windms, -day.of.year, 
+         -eds, -dist.road, -mean.summer.temp, -mean.winter.temp, -percent.max.temp.days,
+         -summer.pcpn, -winter.pcpn) #Yep, 188 rows.
 head(transect.covs)
 dim(transect.covs)
 
@@ -330,4 +337,4 @@ transect.covs <- left_join(transect.covs, lowshrub, by = "Site")
 # analysis. When we read in this script later, we will only have the objects that we need. 
 rm(compare.250.50, compare.250.sitesummary, compare.50.sitesummary, compare.sitesummary.250, 
    compare.sitesummary.50, compare.transect.covs.pika.tracks, dist.road, pika.tracks, site.250, 
-   site.50, site.summary, trans.covs, eds.mean, path, path1, snotel, snotel.cov, veg.height, domVeg, lowshrub)
+   site.50, site.summary, trans.covs, eds.mean, path, path1, wx, wx.data, veg.height, domVeg, lowshrub)

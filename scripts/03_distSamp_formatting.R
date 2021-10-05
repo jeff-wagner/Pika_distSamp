@@ -75,15 +75,23 @@ transect.covs$talus <- as.numeric(transect.covs$talus)
 # Covariates that are highly correlated should not be included in the same model
 covs.cor <- transect.covs %>% 
   select(lowshrub, talus, latitude, longitude, slope, aspect, elevation, roughness, tempc, windms,
-         day.of.year, eds, search.time, trans.length, start.hr, dist.road, summerTemp, winterTemp,
-         veg.height, lowshrub.cover, TTD)
+         day.of.year, eds, search.time, trans.length, start.hr, dist.road, mean.summer.temp, 
+         mean.winter.temp, percent.max.temp.days, summer.pcpn, winter.pcpn, veg.height, lowshrub.cover)
 
-cor(covs.cor, use="pairwise")
+cor <- cor(covs.cor, use="pairwise")
 
 # Visualize correlations: only slope and roughness are highly correlated (r=0.85)
 # Anything > 0.60 or < -0.60 we considered correlated and won't consider in same model
 library(psych)
-pairs.panels(covs.cor,ellipses = F)  # It looks like only lowshrub.cover and veg.height are highly correlated
+pairs.panels(covs.cor,ellipses = F)  
+
+cor[which(cor > 0.6)]
+which(cor > 0.6 | cor < -0.6)
+cor[which(cor < 0.6 & cor > -0.6)] <- NA
+View(cor)
+# It looks like lowshrub.cover & veg.height, mean.winter.temp & latitude/longitude,
+# slope & roughness, search time & trans length, and mean.winter.temp & winter.pcpn, 
+# are correlated. We need to be careful using these in the same models. 
 
 # Include transects which were surveyed, but where no individuals were detected -----------------
 # Check which transects didn't produce any observations

@@ -478,3 +478,10 @@ wx.data <- summer.temp %>%
   left_join(summer.pcpn) %>% 
   left_join(winter.pcpn)
 
+rm(a, df, gap_ref, overwrite, pcpn_ref, ref, summer.pcpn, summer.temp, temp_ref,
+   winter.pcpn, winter.temp, wx, wx_ACIS, wx_NRCS, wx_NRCSwinter2017_gaps, ACIS_pcpn,
+   ACIS_temp, i, mean.snow.depth, mean.swe, mean.temp, nrcs, number.max.temp.days, 
+   pcpn.uids, percent.max.temp.days, reps, survey.year, temp.uids, total.days, total.precip,
+   total.precip.snowadj, wx.year)
+
+setwd("C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp")
