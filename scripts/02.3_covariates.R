@@ -96,13 +96,13 @@ head(site.summary)
 # Cumulative precipitation for summer (Jun-Aug, from season preceding survey)
 # Cumulative precipitation for winter (Dec-Mar, from season preceding survey)
 #
-# The legwork for this was done in the '02_covs_WX.r' script. We will read it in here and join it with our
-# working covariate dataframe.
-source("./scripts/02.1_covs_wx.r")
+# The legwork for this was done in QGIS and saved as 'daymet_wx_summary.csv'
+wx <- read.csv("./data/wx_data/daymet_wx_summary.csv")
 
 # Select columns of interest from snotel.cov data (we just need the site, summerTemp, and winterTemp)
-wx <- wx.data %>% 
-  select(Site, mean.summer.temp, mean.winter.temp, percent.max.temp.days, summer.pcpn, winter.pcpn)
+wx <- wx %>%
+  select(Site=X, summer.tmax=avg.tmax, winter.tmin=avg.tmin, percent.tmax.days, summer.pcpn.mm, winter.pcpn.mm) %>% 
+  mutate(percent.tmax.days=percent.tmax.days*100)
 
 # Join with site.summary
 site.summary <- left_join(site.summary, wx, by = 'Site')
@@ -222,7 +222,7 @@ transect.covs   #numerous NA's for low shrub, eds
 
 # Remove the columns not of interest
 transect.covs <- transect.covs %>% 
-  select(-Date)
+  select(-Date, -talus, -roughness)
 dim(transect.covs)  #transect covs is 47 rows.
 
 # Put observers in a single column. This will quadruple the number of rows in the dataframe from 47 to 184 rows
@@ -230,10 +230,9 @@ dim(transect.covs)  #transect covs is 47 rows.
 # Observer 3, Observer 4 columns. Observer will represent the initials of the field observer. obs1.4 is a placeholder
 # for identifying Observers 1, 2, 3, 4. 
 transect.covs <- transect.covs %>% 
-  gather(obs1.4, Observer, -Site, -lowshrub, -talus, -Location, -latitude, -longitude, 
-         -slope, -aspect, -elevation, -roughness, -Year, - tempc, -windms, -day.of.year, 
-         -eds, -dist.road, -mean.summer.temp, -mean.winter.temp, -percent.max.temp.days,
-         -summer.pcpn, -winter.pcpn) #Yep, 188 rows.
+  gather(obs1.4, Observer, -Site, -lowshrub, -Location, -latitude, -longitude, -slope, 
+         -aspect, -elevation, -Year, - tempc, -windms, -day.of.year, -dist.road, -summer.tmax, 
+         -winter.tmin, -percent.tmax.days, -summer.pcpn.mm, -winter.pcpn.mm, -lowshrub, -eds) #Yep, 188 rows.
 head(transect.covs)
 dim(transect.covs)
 
@@ -337,4 +336,4 @@ transect.covs <- left_join(transect.covs, lowshrub, by = "Site")
 # analysis. When we read in this script later, we will only have the objects that we need. 
 rm(compare.250.50, compare.250.sitesummary, compare.50.sitesummary, compare.sitesummary.250, 
    compare.sitesummary.50, compare.transect.covs.pika.tracks, dist.road, pika.tracks, site.250, 
-   site.50, site.summary, trans.covs, eds.mean, path, path1, wx, wx.data, veg.height, domVeg, lowshrub)
+   site.50, trans.covs, eds.mean, path1, wx, veg.height, domVeg, lowshrub)
