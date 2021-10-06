@@ -14,7 +14,7 @@
     load( file = "../_Functions/alldays_2017_2020.rda" )
     
   # Install Required Packages
-  # Automattically install required packages if necessary
+  # Automatically install required packages if necessary
     rqdPkgs <- c('leaflet','jsonlite' )     
     a <- which( !rqdPkgs %in% installed.packages()[,1])
     if ( length( a ) > 0 ){
@@ -25,10 +25,17 @@
 
   # elements 
     elems <- c("mint","maxt","avgt","pcpn","snow","snwd","13")
+    
 
-  # get all alaska weather stations in ACIS system
+  # Get all AK weather stations in ACIS system
     base_url <- paste0("http://data.rcc-acis.org/StnMeta?state=AK&output=json") 
     mta <- fromJSON(base_url )$meta
+    
+    # Filter for stations of interest
+    ACIS_pikaWS <- readRDS("../R11_CompileWx_pika/_output/ACIS_datagap.WS.rds")
+    
+    mta <- mta %>% 
+      filter(uid %in% ACIS_pikaWS$WS.ID)
     
     ACISmeta <- data.frame()
     ACISwx <- data.frame()
@@ -65,49 +72,20 @@
       }
     }
 
-    # Make duplicates just in case
-    ACISmeta1 <- ACISmeta
-    ACISwx1 <- ACISwx
-    
     # Select variables of interest for this analysis
     ACISwx <- ACISwx %>% 
-      select(uid, sid, date, maxt, avgt, pcpn)
-    
-    # ACISwx <- subset(ACISwx, subset=!(maxt == "M" & avgt == "M" & pcpn == "M"))
+      dplyr::select(-mint, -snow, -snwd, -X13)
     
     # Replace trace values (T) with zeros
     t.replace <- function(x) x = ifelse(x=="T", 0, x)
     ACISwx <- ACISwx %>% 
       mutate_at(vars(maxt, avgt, pcpn), t.replace)
     
-    # # Filter out stations with missing values
-    # missing <- data.frame(uid = ACISwx$uid, sid = ACISwx$sid, 
-    #                       missing = apply(ACISwx, 1, function(r) any(r %in% "M")))
-    # missing <- missing %>% 
-    #   filter(missing == TRUE)
-    # missing.uids <- unique(missing$uid)
-    # 
-    # ACISwx.complete <- ACISwx %>% 
-    #   filter(!ACISwx$uid %in% missing.uids)
-    
-    # uids.keep <- unique(ACISwx$uid)
-    # 
-    # ACISmeta <- ACISmeta %>% 
-    #   filter(ACISmeta$uid %in% uids.keep)
-    
-    save( list = c("ACISmeta","ACISwx" ), file = "_data/ACIS_Alaska.rda" )
-    
-    subwx <- subset( ACISwx, snwd != "M" )
-    
-    SNWDstns <- unique( subwx$uid ) 
-    
-    subMeta <- ACISmeta[ which( ACISmeta$uid %in% SNWDstns &
-                                  ACISmeta$snwd_Coverage > 90  ), ]
-    
-    nrow( subMeta )
-    
-    # leaflet( data = subMeta ) %>% addCircles( lat = ~
+    # Replace missing values (M) with NA
+    m.replace <- function(x) x = ifelse(x=="M", NA, x)
+    ACISwx <- ACISwx %>% 
+      mutate_at(vars(maxt, avgt, pcpn), m.replace)
 
     
-    
+    save( list = c("ACISmeta","ACISwx" ), file = "../R11_CompileWx_pika/_output/ACISdatagaps_download.rda" )
     

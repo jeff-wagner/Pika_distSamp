@@ -21,7 +21,7 @@
     sapply( rqdPkgs, FUN = function(x){ library( x, character.only = T ) } )
         
   # set working directory  
-    setwd( "/Users/jeff/Library/Mobile Documents/com~apple~CloudDocs/R/GetWx/20191220 GetWx/R10_CompileWx" )
+    setwd( "C:\\Users\\jeffw\\Dropbox\\GitHub\\Pika_distSamp\\Pika GetWx\\R10_CompileWx" )
 
     # FUNCTION: Apply stringsim function to each item of MatchLs list
     MatchList <- function( MatchStr, MatchLs, Qual = 0.95 ){

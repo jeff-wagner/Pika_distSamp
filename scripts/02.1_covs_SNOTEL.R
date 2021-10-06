@@ -51,10 +51,10 @@ WS.ids <- unique(pika_sites$WS.ID)
 # There is a problem with Independence Mine (ID 1091), so we will remove it for now
 WS.ids <- WS.ids[-3]
 
-# snotel.download <- snotel_download(site_id = WS.ids, path = paste(getwd(), "./data/SNOTEL"), internal = TRUE)
+snotel.download <- snotel_download(site_id = WS.ids, path = paste(getwd(), "./data/SNOTEL"), internal = TRUE)
 # summary(snotel.download)
 
-# Manual download from https://wcc.sc.egov.usda.gov/ with Independence Mine included
+# Manual download from https://wcc.sc.egov.usda.gov/reportGenerator/ with Independence Mine included
 snotel <- read_excel("./data/snotel_data.xlsx", na = 'NA')
 summary(snotel)
 

@@ -22,19 +22,48 @@ sapply( rqdPkgs, FUN = function(x){ library( x, character.only = T ) } )
 # set working directory  
 setwd( "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R10_CompileWx" )
 
-# FUNCTION: Apply stringsim function to each item of MatchLs list
-MatchList <- function( MatchStr, MatchLs, Qual = 0.95 ){
-  strdist <- stringsim( MatchStr, MatchLs, method = "jw" )
-  mtch <- which( strdist >= Qual )
-  return( list( idx = mtch,  qual = strdist[ mtch ] ) )
-}
-
 
 # Load base database (ACIS only) with weather data
 load( file = "_output/WxDbase(R10.01).rda" )
 
 ACISmeta <- meta@data
 
+# Select variables and filter for dates of interest
+wx <- wx %>% 
+  mutate(date = as.Date(date)) %>% 
+  dplyr::select(-pcpn) %>% 
+  filter(date >= "2017-06-01" & date <= "2017-08-31" |
+      date >= "2017-12-01" & date <= "2018-03-31" |
+      date >= "2018-06-01" & date <= "2018-08-31" |
+      date >= "2018-12-01" & date <= "2019-03-31")
+
+# Recode missing values "M" as NAs
+m.replace <- function(x) x = ifelse(x=="M", NA, x)
+wx <- wx %>% 
+  mutate_at(vars(maxt, avgt), m.replace) %>% 
+  mutate(maxt = as.numeric(maxt), avgt = as.numeric(avgt))
+
+uids <- unique(wx$uid)
+
+df <- data.frame(uid = uids, result = NA)
+
+i <- 1
+for(i in 1:length(uids)){
+  a <- subset(wx, uid == uids[i])
+  days <- length(unique(a$date))
+  nas <- sum(is.na(a$avgt))
+  if(nas > days/2){
+    df[i, "result"] <- "toss"
+  }else{
+    df[i, "result"] <- "keep"
+  } 
+}
+
+wx <- left_join(wx, df, by = "uid")
+wx <- wx %>% 
+  filter(result == "keep")
+
+summary(wx)
 
 # Load NRCS weather data
 load( file = "../R04_NRCS/_data/nrcs_Alaska__210128.rda" )
@@ -56,10 +85,6 @@ pika_sites <- read.csv("_data/pika_sites.csv")
 sids <- sapply(ACISmeta$sids, "[[", 1)
 sids <- str_sub(sids, 1, nchar(sids)-2)
 ACISmeta$sids <- sids
-
-# Save back to database for future reference
-meta@data <- ACISmeta
-save( list=c("meta", "wx"), file = "_output/WxDbase(R10.01)_singlesids.rda" )
 
 # Convert to spatial objects
 NRCSmeta <- st_as_sf(NRCSmeta, coords = c("longitude", "latitude"))
@@ -96,32 +121,25 @@ NRCSmeta <- NRCSmeta %>%
   dplyr::select(ntwk, site_name, site_id, geometry)
 NRCSmeta <- rename(NRCSmeta, source = ntwk)
 
+  # Filter for only stations we want to keep
+uids <- unique(wx$uid)
 ACISmeta <- ACISmeta %>% 
-  dplyr::select(source, name, uid, geometry)
+  dplyr::select(source, name, uid, geometry) %>% 
+  filter(uid %in% uids)
 ACISmeta <- rename(ACISmeta, site_name = name, site_id = uid)
 
 WSmeta <- rbind(NRCSmeta, ACISmeta)
 
 # RUNNING LIST OF STATIONS TO FILTER OUT BASED ON DATA AVAILABILITY -------
-# No Precip: SNTLT:1279 - Nicks Valley
-# No Data: SNTL:641 - Frostbite Bottom
-# No Data: SNTLT:768 - Look Eyrie
-# No Precip: SNTL:1268 - Fielding Lake
-# No Precip: ACIS:20886 - Eielson Visitors Center
-# No Precip: ACIS:83137 - Eielson Visitors Center Alaska
-# No Precip: ACIS:82794 - Toklat Alaska
-# No Precip: ACIS:31878 - Montana Creek DOT
-# No Precip: ACIS:83041 - DENALI VISITOR CENTER ALASKA
-# No Precip: ACIS:83140 - WIGAND ALASKA
-# No Precip: ACIS:83053 - DUNKLE HILLS ALASKA
-# No Precip: ACIS:83031 - STAMPEDE ALASKA
+# ACIS:20857 - Chulitna River
+# SNTLT:1279 - Nicks Valley
+# SNTL:641 - Frostbite Bottom
+# SNTLT:768 - Look Eyrie
 
 WSmeta <- WSmeta %>%
-  filter(!site_id %in% c("SNTLT:1279", "SNTL:641", "SNTLT:768", "SNTL:1268", 
-                         "20886", "83137", "82794", "31878", "83041", "83140",
-                         "83053", "83031"))
+  filter(!site_id %in% c("20857", "SNTLT:1279", "SNTL:641", "SNTLT:768"))
 
-write_csv(WSmeta, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/WSmeta.csv")
+# write_csv(WSmeta, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/WSmeta.csv")
 
 # Find the nearest weather station for each pika site
 pika_sites <- pika_sites %>%
@@ -132,6 +150,23 @@ pika_sites <- pika_sites %>%
          WS.name = WSmeta$site_name[match(WSmeta.id, 1:nrow(WSmeta))],
          WS.source = WSmeta$source[match(WSmeta.id, 1:nrow(WSmeta))],
          WS.geometry = WSmeta$geometry[match(WSmeta.id, 1:nrow(WSmeta))])
+
+# Create a new data frame with a row for each site per season
+df1 <- pika_sites %>% 
+  mutate(season = "summer", year = 2017)
+df2 <- pika_sites %>% 
+  mutate(season = "summer", year = 2018)
+df3 <- pika_sites %>% 
+  mutate(season = "winter", year = 2017)
+df4 <- pika_sites %>% 
+  mutate(season = "winter", year = 2018)
+temp_ref <- as_tibble(df1) %>% 
+  full_join(as_tibble(df2)) %>% 
+  full_join(as_tibble(df3)) %>% 
+  full_join(as_tibble(df4)) %>% 
+  mutate(type = "temp")
+
+saveRDS(temp_ref, "../R11_CompileWx_pika/_output/temp_ref.rds")
 
 
 # Map sites and nearest weather stations
@@ -144,4 +179,4 @@ st_crs(WS) <- 4326
 mapView(sites, col.regions = "blue") + mapView(WS, col.regions = "green")
 
 
-write_csv(pika_sites, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/pika_sites_nearestWS_combined.csv")
+write_csv(pika_sites, file = "C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/Pika GetWx/R11_CompileWx_pika/_output/pika_sites_nearestWS_combined_Temp.csv")

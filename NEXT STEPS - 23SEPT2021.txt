@@ -1,0 +1,59 @@
+STEP 1: R06.00 - Filter out ACIS stations and WX data with missing values
+STEP 2: Run through the rest of the GetWx scripts to find new nearest WS (all should have data now)
+STEP 3: R11 - Filter the ACIS Wx database for the stations of interest
+STEP 4: 02.1_covs_WX - Summarize data in the same fashion as the NRCS data. 
+
+
+28SEPT2021 - Notes
+
+ACIS:77623 - Independence Mine: Missing avgt & maxt, but has complete precipitation data
+
+Summer 2017:
+ACIS:20857 - Chulitna River: Missing data for 25 days (pcpn and temp)
+
+Summer 2018:
+ACIS:77596 - Fielding Lake: Missing pcpn
+ACIS:20857 - Chulitna River: Missing data for 14 days (pcpn) (20 days temp)
+ACIS:83041 - Denali Visitors Center: Missing data for 87 days (temp)
+
+Winter 2017:
+ACIS:20857 - Chulitna River: Missing data for 9 days (10 days temp)
+ACIS:79398 - Denali 27 N: Missing data for 26 days (pcpn)
+ACIS:79408 - Glennallen 64 N: No data, missing 121 days
+
+Winter 2018:
+ACIS:20857 - Chulitna River: Missing data for 16 days
+ACIS:79398 - Denali 27 N: Missing data for 4 days
+ACIS:83041 - Denali Visitors Center: Missing data for 33 days (temp)
+
+
+Solutions:
+Filtered out ACIS:20857 - Chulitna River, replaced with avgt/maxt from ACIS:65787 - Ruth Glacier
+
+
+
+Data needs:
+
+-Replacement for ACIS:79408 - Glenallen 64N for Winter 2017
+ 
+	Temperature: 
+	- Summer 2018: Replacement for ACIS:83041 - Denali Visitors Center
+	- Winter 2017: Replacement for ACIS:79408 - Glennallen 64N
+	- Winter 2018: Replacement for ACIS:83041 - Denali Visitors Center
+
+	Precipitation:
+	- Winter 2017: Replacement for ACIS:79398 - Denali 27 N
+		       Replacement for ACIS:79408 - Glenallen 64N
+
+
+Site Matches:
+
+P609: SNTLT:1264 - Horsepasture Pass, Temp Only (all seasons except winter 2018), ACIS:21161 - Lazy Mountain (precip)
+P147: SNTL:1094 - Monahan Flat (Temp + Precip, all seasons)
+P601: SNTL:1089 - Tokositna Valley (Precip, all seasons), ACIS:83053 - Dunkle Hills Alaska (temp)
+P604, P605A: SNTL:1055 - Upper Tsaina River (Temp + Precip, all seasons)
+P002, P003, P005, P007, P008, P010A, P152A, P300: ACIS:20778 - Little Su at Hatcher Pass Bridge (temp)
+
+
+Problems (10/2/2021):
+Missing winter precip for MV, P146A, and Polychrome
