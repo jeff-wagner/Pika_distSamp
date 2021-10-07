@@ -279,6 +279,56 @@ fm40 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm) + scale(summer.tmax
 fm41 <- distsamp(~scale(search.speed) ~scale(aspect) + scale(summer.tmax) + scale(percent.tmax.days), 
                  umf, keyfun="hazard", output="density", unitsOut="kmsq")
 
+# 4 Covariate models
+fm42 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) 
+                 + scale(aspect), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm43 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) 
+                 + scale(summer.tmax), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm44 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) 
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm45 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(aspect)
+                 + scale(summer.tmax), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm46 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(aspect) 
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm47 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.tmax) 
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm48 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn.mm) + scale(aspect) 
+                 + scale(summer.tmax), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm49 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn.mm) + scale(aspect) 
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm50 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn.mm) + scale(summer.tmax) 
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")  
+fm51 <- distsamp(~scale(search.speed) ~vegclass + scale(aspect) + scale(summer.tmax) 
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm52 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm) + scale(aspect)
+                 + scale(summer.tmax), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm53 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm) + scale(aspect)
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm54 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm) + scale(summer.tmax)
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm55 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(aspect) + scale(summer.tmax)
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm56 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm) + scale(aspect) + scale(summer.tmax)
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+
+# 5 Covariate models
+fm57 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) + scale(aspect)
+                 + scale(summer.tmax), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm58 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) + scale(aspect)
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm59 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) + scale(summer.tmax)
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm60 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(aspect) + scale(summer.tmax)
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm61 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn.mm) + scale(aspect) + scale(summer.tmax)
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+fm62 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm) + scale(aspect) + scale(summer.tmax)
+                 + scale(percent.tmax.days), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+
+# 6 Covariate (global) model
+fm63 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) + scale(aspect) 
+                 + scale(summer.tmax) + scale(percent.tmax.days), umf, keyfun="hazard", output="density", 
+                 unitsOut="kmsq")
 
 fmList <- fitList(fm1=fm1, fm2=fm2, fm3=fm3, fm4=fm4, fm5=fm5, fm6=fm6, fm7=fm7,
                   fm8=fm8, fm9=fm9, fm10=fm10, fm11=fm11, fm12=fm12, fm13=fm13,
@@ -286,9 +336,13 @@ fmList <- fitList(fm1=fm1, fm2=fm2, fm3=fm3, fm4=fm4, fm5=fm5, fm6=fm6, fm7=fm7,
                   fm20=fm20, fm21=fm21, fm22=fm22, fm23=fm23, fm24=fm24, fm25=fm25,
                   fm26=fm26, fm27=fm27, fm28=fm28, fm29=fm29, fm30=fm30, fm31=fm31,
                   fm32=fm32, fm33=fm33, fm34=fm34, fm35=fm35, fm36=fm36, fm37=fm37,
-                  fm38=fm38, fm39=fm39, fm40=fm40, fm41=fm41)
+                  fm38=fm38, fm39=fm39, fm40=fm40, fm41=fm41, fm42=fm42, fm43=fm43,
+                  fm44=fm44, fm45=fm45, fm46=fm46, fm47=fm47, fm48=fm48, fm49=fm49,
+                  fm50=fm50, fm51=fm51, fm52=fm52, fm53=fm53, fm54=fm54, fm55=fm55,
+                  fm56=fm56, fm57=fm57, fm58=fm58, fm59=fm59, fm60=fm60, fm61=fm61,
+                  fm62=fm62, fm63=fm63)
 
 modSel(fmList)
 
-# Mean summer temperature (m3) is the best performing model, with the global model (m4) a close second.
-# Since the AIC values are so close, both models are worth interpreting. Next, we will examine model fit.
+# The global model (fm63) is the best performing model.
+# We will model average all models with a delta < 4.
