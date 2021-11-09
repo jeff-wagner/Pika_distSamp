@@ -101,7 +101,7 @@ summary(m6)
 confint(m6, type = "state")
 
 summary(m8)
-confint(m8, type = "state") # Positive effect of tmax days on density... strange
+confint(m8, type = "state") # We will omit this as it's usefulness for AK is questionable
 
 summary(m10)
 confint(m10, type = "state") # Overlaps zero
@@ -137,9 +137,9 @@ library(MuMIn)
 library(parallel)
 library(snow)
 
-full <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) + scale(aspect) 
-                 + scale(summer.tmax) + scale(percent.tmax.days), umf, keyfun="hazard", output="density", 
-                 unitsOut="kmsq")
+full <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) +
+                 scale(aspect) + scale(summer.tmax), umf, keyfun="hazard",
+                 output="density", unitsOut="kmsq")
 
 # Set up cluster
 no_cores <- detectCores()-1
@@ -160,5 +160,4 @@ models <- get.models(modelList, delta < 4, clust)
 stopCluster(clust)
 
 rm(list=setdiff(ls(), c("umf", "modelList", "modelList.sub", "models", "transect.covs")))
-
    
