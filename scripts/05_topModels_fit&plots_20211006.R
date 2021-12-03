@@ -120,9 +120,9 @@ vegclass.fm1
 library(gridExtra)
 library(grid)
 png("./figures/fm1.covs.plot.png", units = "in", width = 8, height = 8, res = 300)
-fm1.covs.plot <- grid.arrange(arrangeGrob(aspect.fm1, summerpcpn.fm1,
-                                          summertmax.fm1, tmaxdays.fm1,
-                                          nrow = 2, ncol = 2, 
+fm1.covs.plot <- grid.arrange(arrangeGrob(aspect.fm1, latitude.fm1,
+                                          grid::nullGrob(), vegclass.fm1, grid::nullGrob(),
+                                          layout_matrix = matrix(c(1,1,2,2,3,4,4,5), byrow = TRUE, ncol = 4),
                                           left = textGrob(expression(
                                             paste("Denisty (Pika / km" ^ "2"*")")),
                                                          rot = 90,  gp = gpar(fontsize = 10))))
@@ -132,18 +132,6 @@ library(gplots)
 pdf("./figures/top.models.table.pdf", width = 22, height = 6)
 grid.table(modelList.sub)
 dev.off()
-
-with(m3.pred.arrange, {
-  plot(summerTemp, Predicted, ylim=c(0,50), type="n",  #xaxt="n", yaxt="n",
-       xlab="Mean Summer Temp (ºC)",
-       ylab=(expression(paste("Pika /  ", km^"2"))),
-       cex.lab=1.75, cex.axis=1.5) 
-  lines(lowess(summerTemp, Predicted), lty=1, lwd=2) 
-  lines(lowess(summerTemp, upper), lty=1, lwd=0.5)
-  lines(lowess(summerTemp, lower), lty=1, lwd=0.5)   #aspect for exported image 600x540
-})
-
-
 
 # MODEL AVERAGING ---------------------------------------------------------
 library(AICcmodavg)
@@ -200,9 +188,12 @@ avg.summertmax <- data.frame(aspect = meanaspect, latitude = meanlatitude, summe
                              summer.tmax = summertmax, vegclass = vegclass, transect = avg.covs$transect,
                              Location = avg.covs$Location)
 
-avg.aspect.predict <- predict(avg, type="state", newdata=avg.aspect, appendData=TRUE)
-avg.latitude.predict <- predict(avg, type="state", newdata=avg.latitude, appendData=TRUE)
-avg.vegclass.predict <- predict(avg, type="state", newdata=avg.vegclass, appendData=TRUE)
+avg.aspect.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
+                                 newdata=avg.aspect)
+avg.latitude.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
+                                   newdata=avg.latitude)
+avg.vegclass.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
+                                   newdata=avg.vegclass)
 avg.summerpcpn.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
                                      newdata=avg.summerpcpn)
 avg.summertmax.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
