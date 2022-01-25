@@ -1,26 +1,22 @@
-# Pika distance sampling initialization script
+# Pika logistic regression (historical occupancy) initialization script
 
 # To be sourced in at the beginning of every script
 
-## GITHUB PAC: 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
+## GITHUB PAC: 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
 
 # Set working directory ---------------------------------------------------------
-# Set the working directory to the 'pika_distsamp' folder so we can access both the 
-# 'data' and 'scripts' subfolders
+# No need to set wd in Rproject
 getwd()
-# setwd("C:/Users/jeffw/GitHub/Pika_distSamp")
 
 # Load packages -----------------------------------------------------------------
 
 library(dplyr)
 library(data.table)
 library(tidyverse)
-library(unmarked)
 library(lubridate)
 library(ggplot2)
 library(readxl)
 library(psych)
-library(snotelr)
 library(sf)
 library(sp)
 library(mapview)
@@ -28,4 +24,4 @@ library(lwgeom)
 
 
 # Set path to Excel workbook that contains the data -----------------------------
-path <- "./data/pika.distance.sampling.11.8.2019.xlsx"
+path <- "./data/pika_site_occupation.csv"
