@@ -121,15 +121,15 @@ site.250 <- read_excel(path=path1, sheet="250mCover")
 site.250 <- as.data.frame(site.250)
 head(site.250)
 
-# Primary interests are % cover of low shrub and % cover of talus
+# Primary interests are % cover of shrub and % cover of talus
 site.250 <- site.250 %>% 
-  select(Site, `LS_%`, `Talus_%`)
+  select(Site, `LS_%`, `TS_%`, `Talus_%`)
 head(site.250)
 site.250  
 
 # Rename these columns to something simpler
 site.250 <- site.250 %>% 
-  rename(lowshrub = `LS_%`, talus = `Talus_%`)
+  rename(lowshrub = `LS_%`, tallshrub = `TS_%`, talus = `Talus_%`)
 
 # There are NA's for LS_% that will either need values of 0 or something else. Will leave as NA's for now.
 unique(site.250$Site)   # 47 sites and all are unique
@@ -232,7 +232,7 @@ dim(transect.covs)  #transect covs is 47 rows.
 transect.covs <- transect.covs %>% 
   gather(obs1.4, Observer, -Site, -lowshrub, -Location, -latitude, -longitude, -slope, 
          -aspect, -elevation, -Year, - tempc, -windms, -day.of.year, -dist.road, -summer.tmax, 
-         -winter.tmin, -percent.tmax.days, -summer.pcpn.mm, -winter.pcpn.mm, -lowshrub, -eds) #Yep, 188 rows.
+         -winter.tmin, -percent.tmax.days, -summer.pcpn.mm, -winter.pcpn.mm, -lowshrub, - tallshrub, -eds) #Yep, 188 rows.
 head(transect.covs)
 dim(transect.covs)
 
@@ -320,7 +320,7 @@ eds.mean <- mean(transect.covs$eds, na.rm = TRUE)
 
 transect.covs$eds <- replace(transect.covs$eds, is.na(transect.covs$eds), eds.mean)
 
-# Part 10: Add in other vegetation covariates and final cleanup -------------------------------------------------------------
+# Part 10: Add in other vegetation covariates -------------------------------------------------------------
 source("scripts/02.2_covs_veg.r")
 
 # Add in dominant vegetation within 50m of the talus
@@ -331,6 +331,19 @@ transect.covs <- left_join(transect.covs, veg.height, by = "Site")
 
 # Add in percent cover of lowshrub from 10x10m veg plots
 transect.covs <- left_join(transect.covs, lowshrub, by = "Site")
+
+# Add in total shrub cover within plot
+
+
+
+# Part 11: Convert aspect to meaningful variables ----------------------------------
+
+# Degrees to radians
+transect.covs$aspectRad <- transect.covs$aspect*pi/180
+
+# Calculate northness & eastness
+transect.covs <- transect.covs %>% 
+  mutate(northness = cos(aspectRad), eastness = sin(aspectRad))
 
 # Lastly, cleanup the environment, keeping only the objects that we will use in the final
 # analysis. When we read in this script later, we will only have the objects that we need. 
