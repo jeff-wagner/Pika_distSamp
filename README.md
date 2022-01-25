@@ -4,7 +4,7 @@
 
 This is an abundance analysis of collared pika *(Ochotona collaris)* at sites across Southcentral & Interior Alaska. 
 
-* The analysis is organized as follows:
+* The analysis is organized in the __scripts__ folder as follows:
   +  **initscript.R:** Set WD, file paths, and load required packages.
   +  **Scripts 01.x:** Data management of observations & GPS tracks.
   +  **Scripts 02.x:** Data management of covariates.
