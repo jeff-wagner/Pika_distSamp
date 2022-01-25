@@ -11,3 +11,5 @@ This is an abundance analysis of collared pika *(Ochotona collaris)* at sites ac
   +  **Scripts 03.distSamp_formatting:** Formatting data for package *unmarked*.
   +  **Scripts 04.x:** Build & run distance sampling models; model selection.
   +  **Scripts 05.x:** Examine top models & plot results.
+
+Additionally, there is a simple logistic regression alaysis in the __LogReg__ folder that evaluates the current occupation status of historically occupied sites.
