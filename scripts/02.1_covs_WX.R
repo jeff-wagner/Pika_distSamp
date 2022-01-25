@@ -1,17 +1,17 @@
 source("scripts/initscript.r")
-setwd("C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/data")
+#setwd("C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp/data")
 
 # Load manually downloaded NRCS weather data and previously saved ACIS database
 
-wx_NRCSsummer2017 <- read.table("./wx_data/NRCS/summer2017_NRCS_30sep21.txt", sep = ",", header = T, skip = 59)
-wx_NRCSsummer2018 <- read.table("./wx_data/NRCS/summer2018_NRCS_30sep21.txt", sep = ",", header = T, skip = 59)
-wx_NRCSwinter2017 <- read.table("./wx_data/NRCS/winter2017_NRCS_30sep21.txt", sep = ",", header = T, skip = 60)
-wx_NRCSwinter2018 <- read.table("./wx_data/NRCS/winter2018_NRCS_30sep21.txt", sep = ",", header = T, skip = 60)
+wx_NRCSsummer2017 <- read.table("./data/wx_data/NRCS/summer2017_NRCS_30sep21.txt", sep = ",", header = T, skip = 59)
+wx_NRCSsummer2018 <- read.table("./data/wx_data/NRCS/summer2018_NRCS_30sep21.txt", sep = ",", header = T, skip = 59)
+wx_NRCSwinter2017 <- read.table("./data/wx_data/NRCS/winter2017_NRCS_30sep21.txt", sep = ",", header = T, skip = 60)
+wx_NRCSwinter2018 <- read.table("./data/wx_data/NRCS/winter2018_NRCS_30sep21.txt", sep = ",", header = T, skip = 60)
 
-wx_NRCSwinter2017_gaps <- read.table("./wx_data/NRCS/winter2017_NRCS_datagaps_precip_29sep21.txt", sep = ",", header = T, skip = 53)
+wx_NRCSwinter2017_gaps <- read.table("./data/wx_data/NRCS/winter2017_NRCS_datagaps_precip_29sep21.txt", sep = ",", header = T, skip = 53)
 wx_NRCSwinter2017 <- full_join(wx_NRCSwinter2017, wx_NRCSwinter2017_gaps)
 
-load(file = "../Pika GetWx/R11_CompileWx_pika/_output/ACISdownload.rda")
+load(file = "./Pika GetWx/R11_CompileWx_pika/_output/ACISdownload.rda")
 
 # Recombine ACIS meta and wx data into a format like the NRCS data
 wx_ACIS <- left_join(ACISwx, ACISmeta, by = "uid")
@@ -27,7 +27,7 @@ wx_ACIS$pcpn <- ifelse(wx_ACIS$pcpn == "S", NA, wx_ACIS$pcpn)
 wx_ACIS$pcpn <- as.numeric(gsub("[^0-9.-]", "", wx_ACIS$pcpn))
 
 # Separate into dataframes for pcpn and temp ------------------------------
-ACIS_pikaWS <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/ACIS_pikaWS.rds")
+ACIS_pikaWS <- readRDS("./Pika GetWx/R11_CompileWx_pika/_output/ACIS_pikaWS.rds")
 
 temp.uids <- subset(ACIS_pikaWS, type == "temp")$WS.ID
 pcpn.uids <- subset(ACIS_pikaWS, type == "precip")$WS.ID
@@ -360,9 +360,9 @@ ACIS_winter2017_pcpn <- ACIS_winter2017_pcpn %>%
   filter(!Station.Id %in% c(79398, 79408))
 
 # Add in data from new stations
-summer2018_tempgap <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/ACIS_summer2018_temp_datagap.rds")
-winter2017_tempgap <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/ACIS_winter2017_temp_datagap.rds")
-winter2018_tempgap <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/ACIS_winter2018_temp_datagap.rds")
+summer2018_tempgap <- readRDS("./Pika GetWx/R11_CompileWx_pika/_output/ACIS_summer2018_temp_datagap.rds")
+winter2017_tempgap <- readRDS("./Pika GetWx/R11_CompileWx_pika/_output/ACIS_winter2017_temp_datagap.rds")
+winter2018_tempgap <- readRDS("./Pika GetWx/R11_CompileWx_pika/_output/ACIS_winter2018_temp_datagap.rds")
 
 ACIS_summer2018_temp <- rbind(ACIS_summer2018_temp, summer2018_tempgap)
 ACIS_winter2017_temp <- rbind(ACIS_winter2017_temp, winter2017_tempgap)
@@ -404,9 +404,9 @@ wx <- full_join(wx_ACIS, wx_NRCS)
 
 # Cross-reference to Pika Sites and add into Site Covs --------------------
 # Load reference dataframe
-pcpn_ref <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/pcpn_ref.rds")
-temp_ref <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/temp_ref.rds")
-gap_ref <- readRDS("../Pika GetWx/R11_CompileWx_pika/_output/datagap.WS.rds")
+pcpn_ref <- readRDS("./Pika GetWx/R11_CompileWx_pika/_output/pcpn_ref.rds")
+temp_ref <- readRDS("./Pika GetWx/R11_CompileWx_pika/_output/temp_ref.rds")
+gap_ref <- readRDS("./Pika GetWx/R11_CompileWx_pika/_output/datagap.WS.rds")
 
 ref <- full_join(pcpn_ref, temp_ref)
 ref$label <- "original"
@@ -484,4 +484,4 @@ rm(a, df, gap_ref, overwrite, pcpn_ref, ref, summer.pcpn, summer.temp, temp_ref,
    pcpn.uids, percent.max.temp.days, reps, survey.year, temp.uids, total.days, total.precip,
    total.precip.snowadj, wx.year)
 
-setwd("C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp")
+#setwd("C:/Users/jeffw/Dropbox/GitHub/Pika_distSamp")
