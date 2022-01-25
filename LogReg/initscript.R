@@ -2,8 +2,6 @@
 
 # To be sourced in at the beginning of every script
 
-## GITHUB PAC: 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
-
 # Set working directory ---------------------------------------------------------
 # No need to set wd in Rproject
 getwd()
