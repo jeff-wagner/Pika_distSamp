@@ -21,5 +21,17 @@ siteOcc <- read.csv(path)
 siteOcc <- siteOcc %>% 
   filter(random_site == 0)
 
-# Read in site covariates from the distance sampling analysis
+# Read in site (transect) covariates from the distance sampling analysis
 source("scripts/02.3_covariates.R")
+
+# Filter to keep only one row per site & join to siteOcc
+transect.covs <- transect.covs %>% 
+  select(-(obs1.4:search.speed), -latitude, -longitude) %>% # get rid of transect-specific columns
+  distinct() %>% # filter out duplicate rows
+  filter(Site %in% unique(siteOcc$Site)) # keep only historical sites
+
+siteOcc <- siteOcc %>% 
+  left_join(., transect.covs, by = c("Location", "Site", "Year"))
+
+# Write out site-level data with covariates
+save(siteOcc, file = "./LogReg/siteOcc.RDS")
