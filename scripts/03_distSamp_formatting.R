@@ -69,13 +69,14 @@ summary(transect.covs)
 # Some numeric columns with NA need to be told to be numeric.
 is.numeric(transect.covs$lowshrub)
 transect.covs$lowshrub <- as.numeric(transect.covs$lowshrub)
+transect.covs$talus <- as.numeric(transect.covs$talus)
 
 # Check for correlations ------------------------------------------------------------------------
 # Covariates that are highly correlated should not be included in the same model
 covs.cor <- transect.covs %>% 
-  select(lowshrub, latitude, longitude, slope, aspect, elevation, tempc, windms,
-         day.of.year, eds, search.time, trans.length, start.hr, dist.road, summer.tmax, 
-         winter.tmin, percent.tmax.days, summer.pcpn.mm, winter.pcpn.mm, veg.height, lowshrub.cover)
+  select(lowshrub, talus, latitude, longitude, slope, aspect, elevation, roughness, tempc, windms,
+         day.of.year, eds, search.time, trans.length, start.hr, dist.road, mean.summer.temp, 
+         mean.winter.temp, percent.max.temp.days, summer.pcpn, winter.pcpn, veg.height, lowshrub.cover)
 
 cor <- cor(covs.cor, use="pairwise")
 
@@ -87,6 +88,7 @@ pairs.panels(covs.cor,ellipses = F)
 cor[which(cor > 0.6)]
 which(cor > 0.6 | cor < -0.6)
 cor[which(cor < 0.6 & cor > -0.6)] <- NA
+View(cor)
 # It looks like lowshrub.cover & veg.height, mean.winter.temp & latitude/longitude,
 # slope & roughness, search time & trans length, and mean.winter.temp & winter.pcpn, 
 # are correlated. We need to be careful using these in the same models. 

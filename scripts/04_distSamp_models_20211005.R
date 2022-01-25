@@ -61,15 +61,15 @@ m4 <- distsamp(~scale(search.speed) ~scale(elevation),
                umf, keyfun="hazard", output="density", unitsOut="kmsq")  
 m5 <- distsamp(~scale(search.speed) ~scale(dist.road), 
                umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m6 <- distsamp(~scale(search.speed) ~scale(summer.tmax), 
+m6 <- distsamp(~scale(search.speed) ~scale(mean.summer.temp), 
                umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m7 <- distsamp(~scale(search.speed) ~scale(winter.tmin), 
+m7 <- distsamp(~scale(search.speed) ~scale(mean.winter.temp), 
                umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m8 <- distsamp(~scale(search.speed) ~scale(percent.tmax.days), 
+m8 <- distsamp(~scale(search.speed) ~scale(percent.max.temp.days), 
                  umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m9 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm), 
+m9 <- distsamp(~scale(search.speed) ~scale(summer.pcpn), 
                umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m10 <- distsamp(~scale(search.speed) ~scale(winter.pcpn.mm), 
+m10 <- distsamp(~scale(search.speed) ~scale(winter.pcpn), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m11 <- distsamp(~scale(search.speed) ~vegclass, 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
@@ -90,7 +90,7 @@ m14 <- distsamp(~scale(search.speed) ~scale(latitude) + vegclass,
                umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m15 <- distsamp(~scale(search.speed) ~vegclass + scale(aspect), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m16 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn.mm), 
+m16 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m17 <- distsamp(~scale(search.speed) ~vegclass + scale(elevation), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
@@ -100,7 +100,7 @@ m19 <- distsamp(~scale(search.speed) ~vegclass + scale(percent.max.temp.days),
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m20 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(aspect), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m21 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm), 
+m21 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m22 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(elevation), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
@@ -108,7 +108,7 @@ m23 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(dist.road),
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m24 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(percent.max.temp.days), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m25 <- distsamp(~scale(search.speed) ~scale(aspect) + scale(summer.pcpn.mm), 
+m25 <- distsamp(~scale(search.speed) ~scale(aspect) + scale(summer.pcpn), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m26 <- distsamp(~scale(search.speed) ~scale(aspect) + scale(elevation), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
@@ -116,11 +116,11 @@ m27 <- distsamp(~scale(search.speed) ~scale(aspect) + scale(dist.road),
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m28 <- distsamp(~scale(search.speed) ~scale(aspect) + scale(percent.max.temp.days), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m29 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm) + scale(elevation), 
+m29 <- distsamp(~scale(search.speed) ~scale(summer.pcpn) + scale(elevation), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m30 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm) + scale(dist.road), 
+m30 <- distsamp(~scale(search.speed) ~scale(summer.pcpn) + scale(dist.road), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m31 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm) + scale(percent.max.temp.days), 
+m31 <- distsamp(~scale(search.speed) ~scale(summer.pcpn) + scale(percent.max.temp.days), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m32 <- distsamp(~scale(search.speed) ~scale(elevation) + scale(dist.road), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
@@ -143,152 +143,66 @@ fmList <- fitList(null=null, m1=m1, m2=m2, m3=m3, m4=m4, m5=m5, m6=m6, m7=m7,
 modSel(fmList)
 
 # Part 4: Parameter Estimates – look for significance ---------------------
-summary(m11)
-confint(m11, type = "state")
+summary(temp1)
+confint(temp1, type = "state")
 
-summary(m1)
-confint(m1, type = "state")
+summary(env4)
+confint(env4, type = "state")
 
-summary(m9)
-confint(m9, type = "state")
+summary(phys1)
+confint(phys1, type = "state")
 
-summary(m3)
-confint(m3, type = "state")
+summary(env1)
+confint(env1, type = "state")
 
-summary(m6)
-confint(m6, type = "state")
+summary(phys3)
+confint(phys3, type = "state")
 
-summary(m8)
-confint(m8, type = "state") # Positive effect of tmax days on density... strange
+summary(phys4)
+confint(phys4, type = "state") # Overlaps zero
 
-summary(m10)
-confint(m10, type = "state") # Overlaps zero
-
-summary(m4)
-confint(m4, type = "state") # Overlaps zero
-
-summary(m5)
-confint(m5, type = "state") # Overlaps zero
+summary(phys7)
+confint(phys7, type = "state") # Overlaps zero
 
 summary(null)
 confint(null, type = "state") # Overlaps zero
 
-summary(m12)
-confint(m12, type = "state") # Overlaps zero
+summary(env3)
+confint(env3, type = "state") # Overlaps zero
 
-summary(m7)
-confint(m7, type = "state") # Overlaps zero
+summary(env2)
+confint(env2, type = "state") # Overlaps zero
 
-summary(m13)
-confint(m13, type = "state") # Overlaps zero
+summary(temp2)
+confint(temp2, type = "state") # Overlaps zero
 
-summary(m2)
-confint(m2, type = "state") # Overlaps zero
+summary(phys2)
+confint(phys2, type = "state") # Overlaps zero
+
+summary(phys5)
+confint(phys5, type = "state") # Overlaps zero
+
+summary(phys6)
+confint(phys6, type = "state") # Overlaps zero
 
 # Part 5: Final Model Set: Single covariate & additive models  -------------------------------------------------
 
 # Final Model List:
+# m1 <- distsamp(~scale(search.speed) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
+# m2 <- distsamp(~scale(search.speed) ~scale(latitude), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+# m3 <- distsamp(~scale(search.speed) ~scale(day.of.year)+scale(windms)+scale(eds), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+# m4 <- distsamp(~scale(search.speed) ~scale(latitude)+scale(day.of.year)+scale(windms)+scale(eds), umf, keyfun="hazard", output="density", unitsOut="kmsq") # global model
 
-# Top single covariate models with non-overlapping estimates:
-fm1 <- distsamp(~scale(search.speed) ~vegclass, 
-                umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm2 <- distsamp(~scale(search.speed) ~scale(latitude), 
-               umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm3 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm), 
-               umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm4 <- distsamp(~scale(search.speed) ~scale(aspect), 
-               umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm5 <- distsamp(~scale(search.speed) ~scale(summer.tmax), 
-               umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm6 <- distsamp(~scale(search.speed) ~scale(percent.tmax.days), 
-               umf, keyfun="hazard", output="density", unitsOut="kmsq")
-
-# 2 Covariate models
-
-fm7 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude), 
-                umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm8 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn.mm), 
-                umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm9 <- distsamp(~scale(search.speed) ~vegclass + scale(aspect), 
-                umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm10 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm11 <- distsamp(~scale(search.speed) ~vegclass + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm12 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm13 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(aspect), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm14 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm15 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm16 <- distsamp(~scale(search.speed) ~(summer.pcpn.mm) + scale(aspect), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm17 <- distsamp(~scale(search.speed) ~(summer.pcpn.mm) + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm18 <- distsamp(~scale(search.speed) ~(summer.pcpn.mm) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm19 <- distsamp(~scale(search.speed) ~scale(aspect) + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm20 <- distsamp(~scale(search.speed) ~scale(aspect) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm21 <- distsamp(~scale(search.speed) ~scale(summer.tmax) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-
-# 3 Covariate models
-
-fm22 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm23 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(aspect), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm24 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm25 <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm26 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn.mm) + scale(aspect), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm27 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn.mm) + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm28 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.pcpn.mm) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm29 <- distsamp(~scale(search.speed) ~vegclass + scale(aspect) + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm30 <- distsamp(~scale(search.speed) ~vegclass + scale(aspect) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm31 <- distsamp(~scale(search.speed) ~vegclass + scale(summer.tmax) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm32 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm) + scale(aspect), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm33 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm) + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm34 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm35 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(aspect) + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm36 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(aspect) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm37 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.tmax) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm38 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm) + scale(aspect) + scale(summer.tmax), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm39 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm) + scale(aspect) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm40 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm) + scale(summer.tmax) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-fm41 <- distsamp(~scale(search.speed) ~scale(aspect) + scale(summer.tmax) + scale(percent.tmax.days), 
-                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-
-
-fmList <- fitList(fm1=fm1, fm2=fm2, fm3=fm3, fm4=fm4, fm5=fm5, fm6=fm6, fm7=fm7,
-                  fm8=fm8, fm9=fm9, fm10=fm10, fm11=fm11, fm12=fm12, fm13=fm13,
-                  fm14=fm14, fm15=fm15, fm16=fm16, fm17=fm17, fm18=fm18, fm19=fm19,
-                  fm20=fm20, fm21=fm21, fm22=fm22, fm23=fm23, fm24=fm24, fm25=fm25,
-                  fm26=fm26, fm27=fm27, fm28=fm28, fm29=fm29, fm30=fm30, fm31=fm31,
-                  fm32=fm32, fm33=fm33, fm34=fm34, fm35=fm35, fm36=fm36, fm37=fm37,
-                  fm38=fm38, fm39=fm39, fm40=fm40, fm41=fm41)
-
-modSel(fmList)
+# m1 <- distsamp(~scale(search.speed) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
+# m2 <- distsamp(~scale(search.speed) ~scale(latitude), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m3 <- distsamp(~scale(search.speed) ~scale(summerTemp), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+# m4 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summerTemp), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+# m5 <- distsamp(~scale(search.speed) ~scale(latitude^2), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+# m6 <- distsamp(~scale(search.speed) ~scale(latitude^2) + scale(summerTemp), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+# 
+# fmList <- fitList(m1=m1, m2=m2, m3=m3, m4=m4, m5=m5, m6=m6)
+# 
+# modSel(fmList)
 
 # Mean summer temperature (m3) is the best performing model, with the global model (m4) a close second.
 # Since the AIC values are so close, both models are worth interpreting. Next, we will examine model fit.
