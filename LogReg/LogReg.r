@@ -34,4 +34,5 @@ siteOcc <- siteOcc %>%
   left_join(., transect.covs, by = c("Location", "Site", "Year"))
 
 # Write out site-level data with covariates
-save(siteOcc, file = "./LogReg/siteOcc.RDS")
+# save(siteOcc, file = "./LogReg/siteOcc.RDS")
+# write.csv(siteOcc, file = "./LogReg/siteOcc.csv")
