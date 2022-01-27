@@ -35,114 +35,129 @@ modSel(fmList)
 
 # Part 2: Detection Probability Models  --------------------------------------------------------------------
 # Explore covariates that hypothesize might influence detection probability.
-# Use the 'scale' command for continuous variables to improve model fit and to allow comparisons of coefficients 
-# on a standardized scale.
+# Use the 'scale' command for continuous variables to improve model fit and to allow comparisons of coefficients on a standardized scale.
 m.det1 <- distsamp(~scale(search.speed) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m.det2 <- distsamp(~observer ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m.det3 <- distsamp(~Observer ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m.det4 <- distsamp(~scale(tempc) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m.det5 <- distsamp(~scale(windms) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m.det6 <- distsamp(~scale(start.hr) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m.det7 <- distsamp(~scale(roughness) ~1, umf, keyfun ="hazard", output="density", unitsOut = "kmsq")
+m.det7 <- distsamp(~scale(day.of.year) ~1, umf, keyfun ="hazard", output="density", unitsOut = "kmsq")
 
 fmList <- fitList(m.det1=m.det1, m.det2=m.det2, m.det3=m.det3, m.det4=m.det4, m.det5=m.det5, m.det6=m.det6, m.det7=m.det7)
 modSel(fmList)
 
 # Part 3: Single Covariate Models  ---------------------------------------------------------------------------
-# Develop a set of models varying in complexity that are hypothesized to influence species density, while using 
-# the top-performing covariate on det.prob and detection function.
+# Test single covariates for significance. 
 
-# Physical/Abiotic Covariates ----------------------------------------------------------
 null <- distsamp(~scale(search.speed) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
-phys1 <- distsamp(~scale(search.speed) ~scale(latitude), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-phys2 <- distsamp(~scale(search.speed) ~scale(slope), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-phys3 <- distsamp(~scale(search.speed) ~scale(aspect), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-phys4 <- distsamp(~scale(search.speed) ~scale(elevation), umf, keyfun="hazard", output="density", unitsOut="kmsq")  
-phys5 <- distsamp(~scale(search.speed) ~scale(roughness), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-phys6 <- distsamp(~scale(search.speed) ~scale(talus), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-phys7 <- distsamp(~scale(search.speed) ~scale(dist.road), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m1 <- distsamp(~scale(search.speed) ~scale(latitude), 
+               umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m2 <- distsamp(~scale(search.speed) ~scale(slope), 
+               umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m3 <- distsamp(~scale(search.speed) ~scale(aspect), 
+               umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m4 <- distsamp(~scale(search.speed) ~scale(elevation), 
+               umf, keyfun="hazard", output="density", unitsOut="kmsq")  
+m5 <- distsamp(~scale(search.speed) ~scale(dist.road), 
+               umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m6 <- distsamp(~scale(search.speed) ~scale(summer.tmax), 
+               umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m7 <- distsamp(~scale(search.speed) ~scale(winter.tmin), 
+               umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m8 <- distsamp(~scale(search.speed) ~scale(percent.tmax.days), 
+                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m9 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm), 
+               umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m10 <- distsamp(~scale(search.speed) ~scale(winter.pcpn.mm), 
+                umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m11 <- distsamp(~scale(search.speed) ~vegclass, 
+                umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m12 <- distsamp(~scale(search.speed) ~scale(lowshrub.cover), 
+                umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m13 <- distsamp(~scale(search.speed) ~scale(veg.height), 
+                umf, keyfun="hazard", output="density", unitsOut="kmsq")
 
 
-# Environmental Covariates -------------------------------------------------------------
-env1 <- distsamp(~scale(search.speed) ~scale(day.of.year), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-env2 <- distsamp(~scale(search.speed) ~scale(veg.height), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-env3 <- distsamp(~scale(search.speed) ~scale(lowshrub.cover), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-env4 <- distsamp(~scale(search.speed) ~vegclass, umf, keyfun="hazard", output="density", unitsOut="kmsq")
-
-# Temperature Covariates -------------------------------------------------------------
-temp1 <- distsamp(~scale(search.speed) ~scale(summerTemp), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-temp2 <- distsamp(~scale(search.speed) ~scale(winterTemp), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-temp3 <- distsamp(~scale(search.speed) ~scale(TTD), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-
-fmList <- fitList(null=null, phys1=phys1, phys2=phys2, phys3=phys3, phys4=phys4, phys5=phys5, 
-                  phys6=phys6, phys7=phys7,
-                  env1=env1, env2=env2, env3=env3, env4=env4,
-                  temp1=temp1, temp2=temp2, temp3=temp3)
+fmList <- fitList(null=null, m1=m1, m2=m2, m3=m3, m4=m4, m5=m5, m6=m6, m7=m7, 
+                  m8=m8, m9=m9, m10=m10, m11=m11, m12=m12, m13=m13)
 
 modSel(fmList)
 
-
 # Part 4: Parameter Estimates – look for significance ---------------------
-summary(temp1)
-confint(temp1, type = "state")
+summary(m11)
+confint(m11, type = "state")
 
-summary(env4)
-confint(env4, type = "state")
+summary(m1)
+confint(m1, type = "state")
 
-summary(phys1)
-confint(phys1, type = "state")
+summary(m9)
+confint(m9, type = "state")
 
-summary(env1)
-confint(env1, type = "state")
+summary(m3)
+confint(m3, type = "state")
 
-summary(phys3)
-confint(phys3, type = "state")
+summary(m6)
+confint(m6, type = "state")
 
-summary(phys4)
-confint(phys4, type = "state") # Overlaps zero
+summary(m8)
+confint(m8, type = "state") # We will omit this as it's usefulness for AK is questionable
 
-summary(phys7)
-confint(phys7, type = "state") # Overlaps zero
+summary(m10)
+confint(m10, type = "state") # Overlaps zero
+
+summary(m4)
+confint(m4, type = "state") # Overlaps zero
+
+summary(m5)
+confint(m5, type = "state") # Overlaps zero
 
 summary(null)
 confint(null, type = "state") # Overlaps zero
 
-summary(env3)
-confint(env3, type = "state") # Overlaps zero
+summary(m12)
+confint(m12, type = "state") # Overlaps zero
 
-summary(env2)
-confint(env2, type = "state") # Overlaps zero
+summary(m7)
+confint(m7, type = "state") # Overlaps zero
 
-summary(temp2)
-confint(temp2, type = "state") # Overlaps zero
+summary(m13)
+confint(m13, type = "state") # Overlaps zero
 
-summary(phys2)
-confint(phys2, type = "state") # Overlaps zero
-
-summary(phys5)
-confint(phys5, type = "state") # Overlaps zero
-
-summary(phys6)
-confint(phys6, type = "state") # Overlaps zero
+summary(m2)
+confint(m2, type = "state") # Overlaps zero
 
 # Part 5: Final Model Set: Single covariate & additive models  -------------------------------------------------
 
-# Final Model List:
-# m1 <- distsamp(~scale(search.speed) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
-# m2 <- distsamp(~scale(search.speed) ~scale(latitude), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-# m3 <- distsamp(~scale(search.speed) ~scale(day.of.year)+scale(windms)+scale(eds), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-# m4 <- distsamp(~scale(search.speed) ~scale(latitude)+scale(day.of.year)+scale(windms)+scale(eds), umf, keyfun="hazard", output="density", unitsOut="kmsq") # global model
+# Use the MumIn package to build final model list using the six covariates identified above.
+# The pdredge function will automatically build models for all possible combinations and rank them
+# according to AICc
 
-m1 <- distsamp(~scale(search.speed) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m2 <- distsamp(~scale(search.speed) ~scale(latitude), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m3 <- distsamp(~scale(search.speed) ~scale(summerTemp), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m4 <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summerTemp), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m5 <- distsamp(~scale(search.speed) ~scale(latitude^2), umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m6 <- distsamp(~scale(search.speed) ~scale(latitude^2) + scale(summerTemp), umf, keyfun="hazard", output="density", unitsOut="kmsq")
+library(MuMIn)
+library(parallel)
+library(snow)
 
-fmList <- fitList(m1=m1, m2=m2, m3=m3, m4=m4, m5=m5, m6=m6)
+full <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) +
+                 scale(aspect) + scale(summer.tmax), umf, keyfun="hazard",
+                 output="density", unitsOut="kmsq")
 
-modSel(fmList)
+# Set up cluster
+no_cores <- detectCores()-1
+clusterType <- if(length(find.package("snow", quiet = TRUE))) "SOCK" else "PSOCK"
+clust <- try(makeCluster(getOption("cl.cores", no_cores), type = clusterType))
+clusterEvalQ(clust, library(unmarked))
+clusterExport(clust, "umf")
 
-# Mean summer temperature (m3) is the best performing model, with the global model (m4) a close second.
-# Since the AIC values are so close, both models are worth interpreting. Next, we will examine model fit.
+modelList <- pdredge(full, clust, rank = "AICc", extra = "adjR^2", fixed = "p(shapescale(search.speed))")
+
+par(mfrow = c(1,1), pty = "s", mai = c(0.5,0.2,3,0.2))
+plot(modelList)
+
+# Save all models with a delta < 4
+modelList.sub <- subset(modelList, delta <= 4, recalc.weights = TRUE)
+models <- get.models(modelList, delta < 4, clust)
+
+stopCluster(clust)
+
+rm(list=setdiff(ls(), c("umf", "modelList", "modelList.sub", "models", "transect.covs")))
+   
