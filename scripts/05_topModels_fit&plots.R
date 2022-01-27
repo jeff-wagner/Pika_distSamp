@@ -25,17 +25,15 @@ summary(fm1)
 confint(fm1, type = "state") # Coefficients do not overlap 0
 
 # Assess multicolinearity
-vif(fm1, type = "state")
-fm1.covs <- data.frame(aspect=transect.covs$aspect,
-                       latitude=transect.covs$latitude,
-                       vegclass=transect.covs$vegclass,
+# vif(fm1, type = "state")
+fm1.covs <- data.frame(latitude=transect.covs$latitude,
                        transect=transect.covs$transect,
                        Location=transect.covs$Location)
-fm1.covs$bogus <- runif(119)
-library(car)
-m.vif <- lm(bogus ~ vegclass + scale(aspect) + scale(latitude), data = fm1.covs)
-vif(m.vif)
-detach("package:car")
+# fm1.covs$bogus <- runif(119)
+# library(car)
+# m.vif <- lm(bogus ~ vegclass + scale(aspect) + scale(latitude), data = fm1.covs)
+# vif(m.vif)
+# detach("package:car")
 
 # Function returning three fit-statistics.
 fitstats <- function(fm1) {
@@ -67,37 +65,16 @@ hist(fm1.pred$Predicted)
 # Part 3: Predictions for explanatory variables  ---------------------------------------------------------------------
 # fm1 ------------------
 # Define the dataframe as you have done already. But create a sequence of values within the range you had at your sites.
-meanaspect <- mean(fm1.covs$aspect)
-meanlatitude <- mean(fm1.covs$latitude)
-
-
 # Create a sequence for each variable
-aspect <- seq(min(fm1.covs$aspect), max(fm1.covs$aspect), length = 119)
 latitude <- seq(min(fm1.covs$latitude), max(fm1.covs$latitude), length = 20)
-vegclass <- factor("eds", levels=c("eds","dds","dgh","lic", "ls", "ts"))
 
-fm1.aspect <- data.frame(aspect = aspect, latitude = meanlatitude, vegclass = vegclass)
-fm1.latitude <- data.frame(aspect = meanaspect, latitude = latitude, vegclass = vegclass)
-fm1.vegclass <- data.frame(aspect = meanaspect, latitude = meanlatitude, vegclass = fm1.covs$vegclass)
+fm1.latitude <- data.frame(latitude = latitude)
 
-fm1.aspect.predict <- predict(fm1, type="state", newdata=fm1.aspect, appendData=TRUE)
-fm1.latitude.predict <- predict(fm1, type="state", newdata=fm1.latitude, appendData=TRUE)
-fm1.vegclass.predict <- predict(fm1, type="state", newdata=fm1.vegclass, appendData=TRUE)
-
+fm1.predict <- predict(fm1, type = "state", newdata = fm1.latitude, appendData=TRUE)
 
 # Part 4: Plot results: how do the model predictors influence density?  ----------------------------------------------
-# Top model, aspect -----------
-aspect.fm1 <- ggplot(fm1.aspect.predict, aes(x=aspect, y=Predicted)) +
-  geom_line(size = 1)+
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
-  theme_classic()+
-  xlab("Aspect (º)")+
-  theme(axis.title.y = element_blank())
-
-aspect.fm1
-
 # Top model, latitude -----------
-latitude.fm1 <- ggplot(fm1.latitude.predict, aes(x=latitude, y=Predicted)) +
+latitude.fm1 <- ggplot(fm1.predict, aes(x=latitude, y=Predicted)) +
   geom_line(size = 1)+
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
   theme_classic()+
@@ -106,100 +83,139 @@ latitude.fm1 <- ggplot(fm1.latitude.predict, aes(x=latitude, y=Predicted)) +
 
 latitude.fm1
 
-# Top model, percent summer max temp days -----------
-df <- fm1.vegclass.predict[!duplicated(fm1.vegclass.predict),]
-vegclass.fm1 <- ggplot(df, aes(x = vegclass, y=Predicted)) +
-  geom_bar(stat = "identity")+
-  geom_errorbar(aes(ymin=lower, ymax=upper), width=.2)+
-  theme_classic()+
-  xlab("Vegetation Class")+
-  theme(axis.title.y = element_blank())
-
-vegclass.fm1
-
-library(gridExtra)
-library(grid)
-png("./figures/fm1.covs.plot.png", units = "in", width = 8, height = 8, res = 300)
-fm1.covs.plot <- grid.arrange(arrangeGrob(aspect.fm1, latitude.fm1,
-                                          grid::nullGrob(), vegclass.fm1, grid::nullGrob(),
-                                          layout_matrix = matrix(c(1,1,2,2,3,4,4,5), byrow = TRUE, ncol = 4),
-                                          left = textGrob(expression(
-                                            paste("Denisty (Pika / km" ^ "2"*")")),
-                                                         rot = 90,  gp = gpar(fontsize = 10))))
-dev.off()
+# library(gridExtra)
+# library(grid)
+# png("./figures/fm1.covs.plot.png", units = "in", width = 8, height = 8, res = 300)
+# fm1.covs.plot <- grid.arrange(arrangeGrob(aspect.fm1, latitude.fm1,
+#                                           grid::nullGrob(), vegclass.fm1, grid::nullGrob(),
+#                                           layout_matrix = matrix(c(1,1,2,2,3,4,4,5), byrow = TRUE, ncol = 4),
+#                                           left = textGrob(expression(
+#                                             paste("Denisty (Pika / km" ^ "2"*")")),
+#                                                          rot = 90,  gp = gpar(fontsize = 10))))
+# dev.off()
 
 library(gplots)
 pdf("./figures/top.models.table.pdf", width = 22, height = 6)
-grid.table(modelList.sub)
+grid.table(modelList)
 dev.off()
 
 # MODEL AVERAGING ---------------------------------------------------------
 library(AICcmodavg)
-avg.covs <- data.frame(aspect=transect.covs$aspect,
-                       latitude=transect.covs$latitude,
-                       vegclass=transect.covs$vegclass,
+avg.covs <- data.frame(latitude=transect.covs$latitude,
                        summer.pcpn.mm=transect.covs$summer.pcpn.mm,
                        summer.tmax=transect.covs$summer.tmax,
                        transect=transect.covs$transect,
                        Location=transect.covs$Location)
-fm2 <- models[[2]]
-fm3 <- models[[3]]
-fm4 <- models[[4]]
-mods <- list(fm1,fm2, fm3, fm4)
+lat <- models[[1]]
+precip <- models[[2]]
+latPrecip <- models[[3]]
+latTemp <- models[[4]]
+precipTemp <- models[[5]]
+temp <- models[[6]]
+latPrecipTemp <- models[[7]]
 
-Modnames <- paste("mod", 1:length(mods), sep = "")
+mods <- list(lat=lat, precip=precip, latPrecip=latPrecip, 
+             latTemp=latTemp, precipTemp=precipTemp, 
+             temp=temp, latPrecipTemp=latPrecipTemp)
+
+# Look at model coefficients: which models do we want to average?
+(latCI <- data.frame(coef = coef(lat, type = "state"),  CI = confint(lat, type = "state")))
+(precipCI <- data.frame(coef = coef(precip, type = "state"),  CI = confint(precip, type = "state")))
+(latPrecipCI <- data.frame(coef = coef(latPrecip, type = "state"),  CI = confint(latPrecip, type = "state")))
+(latTempCI <- data.frame(coef = coef(latTemp, type = "state"),  CI = confint(latTemp, type = "state")))
+(precipTempCI <- data.frame(coef = coef(precipTemp, type = "state"),  CI = confint(precipTemp, type = "state")))
+(tempCI <- data.frame(coef = coef(temp, type = "state"),  CI = confint(temp, type = "state")))
+(latPrecipTempCI <- data.frame(coef = coef(latPrecipTemp, type = "state"),  CI = confint(latPrecipTemp, type = "state")))
+
+
+Modnames <- names(mods)
 modavg.pred <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
                           newdata=avg.covs)
+
 
 modavg.pred_df <- data.frame(Predicted = modavg.pred$mod.avg.pred,
                                          lower = modavg.pred$lower.CL,
                                          upper = modavg.pred$upper.CL,
                                          avg.covs)
 
-# Part 3: Predictions for explanatory variables  ---------------------------------------------------------------------
+# Predictions for explanatory variables  ---------------------------------------------------------------------
 # fm1 ------------------
 # Define the dataframe as you have done already. But create a sequence of values within the range you had at your sites.
-meanaspect <- mean(avg.covs$aspect)
 meanlatitude <- mean(avg.covs$latitude)
 meansummerpcpn <- mean(avg.covs$summer.pcpn.mm)
 meansummertmax <- mean(avg.covs$summer.tmax)
 
 
 # Create a sequence for each variable
-aspect <- seq(min(avg.covs$aspect), max(avg.covs$aspect), length = 119)
 latitude <- seq(min(avg.covs$latitude), max(avg.covs$latitude), length = 119)
 summerpcpn <- seq(min(avg.covs$summer.pcpn.mm), max(avg.covs$summer.pcpn.mm), length = 119)
 summertmax <- seq(min(avg.covs$summer.tmax), max(avg.covs$summer.tmax), length = 119)
-vegclass <- factor("eds", levels=c("eds","dds","dgh","lic", "ls", "ts"))
 
-avg.aspect <- data.frame(aspect = aspect, latitude = meanlatitude, summer.pcpn.mm = meansummerpcpn, 
-                         summer.tmax = meansummertmax, vegclass = vegclass, transect = avg.covs$transect,
-                         Location = avg.covs$Location)
-avg.latitude <- data.frame(aspect = meanaspect, latitude = latitude, summer.pcpn.mm = meansummerpcpn, 
-                           summer.tmax = meansummertmax, vegclass = vegclass, transect = avg.covs$transect,
-                           Location = avg.covs$Location)
-avg.vegclass <- data.frame(aspect = meanaspect, latitude = meanlatitude, summer.pcpn.mm = meansummerpcpn, 
-                           summer.tmax = meansummertmax, vegclass = avg.covs$vegclass, transect = avg.covs$transect,
-                           Location = avg.covs$Location)
-avg.summerpcpn <- data.frame(aspect = meanaspect, latitude = meanlatitude, summer.pcpn.mm = summerpcpn, 
-                             summer.tmax = meansummertmax, vegclass = vegclass, transect = avg.covs$transect,
-                             Location = avg.covs$Location)
-avg.summertmax <- data.frame(aspect = meanaspect, latitude = meanlatitude, summer.pcpn.mm = meansummerpcpn, 
-                             summer.tmax = summertmax, vegclass = vegclass, transect = avg.covs$transect,
-                             Location = avg.covs$Location)
 
-avg.aspect.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
-                                 newdata=avg.aspect)
+avg.latitude <- data.frame(latitude = latitude, summer.pcpn.mm = meansummerpcpn, 
+                           summer.tmax = meansummertmax, transect = avg.covs$transect, Location = avg.covs$Location)
+avg.summerpcpn <- data.frame(latitude = meanlatitude, summer.pcpn.mm = summerpcpn, 
+                             summer.tmax = meansummertmax, transect = avg.covs$transect, Location = avg.covs$Location)
+avg.summertmax <- data.frame(latitude = meanlatitude, summer.pcpn.mm = meansummerpcpn, 
+                             summer.tmax = summertmax, transect = avg.covs$transect, Location = avg.covs$Location)
+
 avg.latitude.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
                                    newdata=avg.latitude)
-avg.vegclass.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
-                                   newdata=avg.vegclass)
 avg.summerpcpn.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
                                      newdata=avg.summerpcpn)
 avg.summertmax.predict <- modavgPred(cand.set = mods, modnames = Modnames, parm.type = "lambda",
                                      newdata=avg.summertmax)
 
+avg.latitude.pred_df <- data.frame(Predicted = avg.latitude.predict$mod.avg.pred,
+                                     lower = avg.latitude.predict$lower.CL,
+                                     upper = avg.latitude.predict$upper.CL,
+                                     avg.latitude)
+
 avg.summerpcpn.pred_df <- data.frame(Predicted = avg.summerpcpn.predict$mod.avg.pred,
                                        lower = avg.summerpcpn.predict$lower.CL,
                                        upper = avg.summerpcpn.predict$upper.CL,
                                        avg.summerpcpn)
+
+avg.summertmax.pred_df <- data.frame(Predicted = avg.summertmax.predict$mod.avg.pred,
+                                     lower = avg.summertmax.predict$lower.CL,
+                                     upper = avg.summertmax.predict$upper.CL,
+                                     avg.summertmax)
+
+# Plot results: how do the model predictors influence density?  ----------------------------------------------
+# latitude 
+latAvg <- ggplot(avg.latitude.pred_df, aes(x=latitude, y=Predicted)) +
+  geom_line(size = 1)+
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
+  theme_classic()+
+  xlab("Latitude")+
+  theme(axis.title.y = element_blank())
+
+latAvg
+
+precipAvg <- ggplot(avg.summerpcpn.pred_df, aes(x=summer.pcpn.mm, y=Predicted)) +
+  geom_line(size = 1)+
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
+  theme_classic()+
+  xlab("Average cumulative summer precipitation (mm)")+
+  theme(axis.title.y = element_blank())
+
+precipAvg
+
+tempAvg <- ggplot(avg.summertmax.pred_df, aes(x=summer.tmax, y=Predicted)) +
+  geom_line(size = 1)+
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
+  theme_classic()+
+  xlab("Average daily maximum summer temperatutre (ºC)")+
+  theme(axis.title.y = element_blank())
+
+tempAvg
+
+library(gridExtra)
+library(grid)
+png("./figures/modAvgPlot.png", units = "in", width = 4, height = 8, res = 300)
+avgPlots <- grid.arrange(arrangeGrob(latAvg, precipAvg, tempAvg,
+                                          layout_matrix = matrix(c(1,1,2,2,3,3), byrow = TRUE, ncol = 1),
+                                          left = textGrob(expression(
+                                            paste("Denisty (Pika / km" ^ "2"*")")),
+                                                         rot = 90,  gp = gpar(fontsize = 14))))
+dev.off()

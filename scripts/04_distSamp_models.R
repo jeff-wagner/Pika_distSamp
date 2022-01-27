@@ -55,7 +55,7 @@ m1 <- distsamp(~scale(search.speed) ~scale(latitude),
                umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m2 <- distsamp(~scale(search.speed) ~scale(slope), 
                umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m3 <- distsamp(~scale(search.speed) ~scale(aspect), 
+m3 <- distsamp(~scale(search.speed) ~scale(northness), 
                umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m4 <- distsamp(~scale(search.speed) ~scale(elevation), 
                umf, keyfun="hazard", output="density", unitsOut="kmsq")  
@@ -71,7 +71,7 @@ m9 <- distsamp(~scale(search.speed) ~scale(summer.pcpn.mm),
                umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m10 <- distsamp(~scale(search.speed) ~scale(winter.pcpn.mm), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m11 <- distsamp(~scale(search.speed) ~vegclass, 
+m11 <- distsamp(~scale(search.speed) ~scale(eastness), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m12 <- distsamp(~scale(search.speed) ~scale(lowshrub.cover), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
@@ -85,17 +85,11 @@ fmList <- fitList(null=null, m1=m1, m2=m2, m3=m3, m4=m4, m5=m5, m6=m6, m7=m7,
 modSel(fmList)
 
 # Part 4: Parameter Estimates – look for significance ---------------------
-summary(m11)
-confint(m11, type = "state")
-
 summary(m1)
 confint(m1, type = "state")
 
 summary(m9)
 confint(m9, type = "state")
-
-summary(m3)
-confint(m3, type = "state")
 
 summary(m6)
 confint(m6, type = "state")
@@ -112,8 +106,11 @@ confint(m4, type = "state") # Overlaps zero
 summary(m5)
 confint(m5, type = "state") # Overlaps zero
 
+summary(m11)
+confint(m11, type = "state") # Overlaps zero
+
 summary(null)
-confint(null, type = "state") # Overlaps zero
+confint(null, type = "state") 
 
 summary(m12)
 confint(m12, type = "state") # Overlaps zero
@@ -127,6 +124,9 @@ confint(m13, type = "state") # Overlaps zero
 summary(m2)
 confint(m2, type = "state") # Overlaps zero
 
+summary(m3)
+confint(m3, type = "state") # Overlaps zero
+
 # Part 5: Final Model Set: Single covariate & additive models  -------------------------------------------------
 
 # Use the MumIn package to build final model list using the six covariates identified above.
@@ -137,8 +137,8 @@ library(MuMIn)
 library(parallel)
 library(snow)
 
-full <- distsamp(~scale(search.speed) ~vegclass + scale(latitude) + scale(summer.pcpn.mm) +
-                 scale(aspect) + scale(summer.tmax), umf, keyfun="hazard",
+full <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm) +
+                 scale(summer.tmax), umf, keyfun="hazard",
                  output="density", unitsOut="kmsq")
 
 # Set up cluster
