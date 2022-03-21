@@ -73,9 +73,9 @@ m10 <- distsamp(~scale(search.speed) ~scale(winter.pcpn.mm),
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m11 <- distsamp(~scale(search.speed) ~scale(eastness), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m12 <- distsamp(~scale(search.speed) ~scale(lowshrub.cover), 
+m12 <- distsamp(~scale(search.speed) ~scale(shrubCover), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
-m13 <- distsamp(~scale(search.speed) ~scale(veg.height), 
+m13 <- distsamp(~scale(search.speed) ~scale(meanEVI), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 
 
@@ -85,6 +85,9 @@ fmList <- fitList(null=null, m1=m1, m2=m2, m3=m3, m4=m4, m5=m5, m6=m6, m7=m7,
 modSel(fmList)
 
 # Part 4: Parameter Estimates – look for significance ---------------------
+summary(m12)
+confint(m12, type = "state")
+
 summary(m1)
 confint(m1, type = "state")
 
@@ -112,14 +115,11 @@ confint(m11, type = "state") # Overlaps zero
 summary(null)
 confint(null, type = "state") 
 
-summary(m12)
-confint(m12, type = "state") # Overlaps zero
+summary(m13)
+confint(m13, type = "state") # Overlaps zero
 
 summary(m7)
 confint(m7, type = "state") # Overlaps zero
-
-summary(m13)
-confint(m13, type = "state") # Overlaps zero
 
 summary(m2)
 confint(m2, type = "state") # Overlaps zero
@@ -137,7 +137,7 @@ library(MuMIn)
 library(parallel)
 library(snow)
 
-full <- distsamp(~scale(search.speed) ~scale(latitude) + scale(summer.pcpn.mm) +
+full <- distsamp(~scale(search.speed) ~scale(shrubCover) + scale(latitude) + scale(summer.pcpn.mm) +
                  scale(summer.tmax), umf, keyfun="hazard",
                  output="density", unitsOut="kmsq")
 

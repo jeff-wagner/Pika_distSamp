@@ -333,8 +333,33 @@ transect.covs <- left_join(transect.covs, veg.height, by = "Site")
 transect.covs <- left_join(transect.covs, lowshrub, by = "Site")
 
 # Add in total shrub cover within plot
+shrub <- read.csv("./data/percentShrub.csv") %>% 
+  select(Site, PERCENTAGE) %>% 
+  rename(shrubCover=PERCENTAGE)
+transect.covs <- left_join(transect.covs, shrub, by = "Site")
 
+# Add in EVI
+evi2017 <- read.csv("./data/EVI_2017_zonalStats.csv") %>% 
+  select(pikaSites_Buffer_Site, ScaledMean, ScaledSTD) %>% 
+  rename(Site=pikaSites_Buffer_Site, ScaledMean2017=ScaledMean, ScaledSTD2017=ScaledSTD)
+evi2018 <- read.csv("./data/EVI_2018_zonalStats.csv") %>% 
+  select(pikaSites_Buffer_Site, ScaledMean, ScaledSTD) %>% 
+  rename(Site=pikaSites_Buffer_Site, ScaledMean2018=ScaledMean, ScaledSTD2018=ScaledSTD)
 
+transect.covs <- left_join(transect.covs, evi2017, by = "Site") %>% 
+  left_join(evi2018, by = "Site")
+
+transect.covs$meanEVI <- NA
+for(i in 1:nrow(transect.covs)){
+     if (transect.covs$Year[i]==2018){
+       transect.covs$meanEVI[i] =  transect.covs$ScaledMean2017[i]
+     }else{
+        transect.covs$meanEVI[i] =  transect.covs$ScaledMean2018[i]
+      }
+}
+
+transect.covs <- transect.covs %>% 
+  select(-ScaledMean2017, -ScaledMean2018, -ScaledSTD2017, -ScaledSTD2018)
 
 # Part 11: Convert aspect to meaningful variables ----------------------------------
 
