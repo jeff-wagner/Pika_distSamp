@@ -25,6 +25,7 @@ library(sf)
 library(sp)
 library(mapview)
 library(lwgeom)
+library(AICcmodavg)
 
 
 # Set path to Excel workbook that contains the data -----------------------------

@@ -77,12 +77,22 @@ m12 <- distsamp(~scale(search.speed) ~scale(shrubCover),
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
 m13 <- distsamp(~scale(search.speed) ~scale(meanEVI), 
                 umf, keyfun="hazard", output="density", unitsOut="kmsq")
+m14 <- distsamp(~scale(search.speed) ~scale(meanNDVI),
+                umf, keyfun="hazard", output="density", unitsOut="kmsq")
 
 
 fmList <- fitList(null=null, m1=m1, m2=m2, m3=m3, m4=m4, m5=m5, m6=m6, m7=m7, 
-                  m8=m8, m9=m9, m10=m10, m11=m11, m12=m12, m13=m13)
+                  m8=m8, m9=m9, m10=m10, m11=m11, m12=m12, m13=m13, m14=m14)
 
 modSel(fmList)
+
+# AICc model selection from AICcmodavg
+fmList.AICc <- list("null"=null, "latitude"=m1, "sloper"=m2, "northness"=m3, "elevation"=m4,
+                    "dist.road"=m5, "summer.tmax"=m6, "winter.tmin"=m7, "percent.tmax.days"=m8,
+                    "summer.pcpn.mm"=m9, "winter.pcpn.mm"=m10, "eastness"=m11, "shrubCover"=m12,
+                    "meanEVI"=m13, "meanNDVI"=m14)
+selectionTable <- aictab(fmList.AICc)
+selectionTable
 
 # Part 4: Parameter Estimates – look for significance ---------------------
 summary(m12)
@@ -93,6 +103,9 @@ confint(m1, type = "state")
 
 summary(m9)
 confint(m9, type = "state")
+
+summary(m14)
+confint(m14, type = "state")
 
 summary(m6)
 confint(m6, type = "state")
@@ -138,7 +151,7 @@ library(parallel)
 library(snow)
 
 full <- distsamp(~scale(search.speed) ~scale(shrubCover) + scale(latitude) + scale(summer.pcpn.mm) +
-                 scale(summer.tmax), umf, keyfun="hazard",
+                 scale(meanNDVI) + scale(summer.tmax), umf, keyfun="hazard",
                  output="density", unitsOut="kmsq")
 
 # Set up cluster
@@ -160,4 +173,5 @@ models <- get.models(modelList, delta < 4, clust)
 stopCluster(clust)
 
 rm(list=setdiff(ls(), c("umf", "modelList", "modelList.sub", "models", "transect.covs")))
+   
    

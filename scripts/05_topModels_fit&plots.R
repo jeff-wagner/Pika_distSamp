@@ -13,7 +13,7 @@
 # and predicted density against model parameters.
 
 # Read in the model building script. ** Note: This may take a while to load as R has to rebuild all of the models. **
-source("scripts/04_distSamp_models_20211006.r")
+source("scripts/04_distSamp_models.r")
 
 
 # Part 1: Goodness of fit of the best performing models  --------------------------------------------------------
@@ -26,7 +26,9 @@ confint(fm1, type = "state") # Coefficients do not overlap 0
 
 # Assess multicolinearity
 # vif(fm1, type = "state")
-fm1.covs <- data.frame(latitude=transect.covs$latitude,
+fm1.covs <- data.frame(meanNDVI=transect.covs$meanNDVI,
+                       shrubCover=transect.covs$shrubCover,
+                       summer.tmax=transect.covs$summer.tmax,
                        transect=transect.covs$transect,
                        Location=transect.covs$Location)
 # fm1.covs$bogus <- runif(119)
@@ -65,34 +67,86 @@ hist(fm1.pred$Predicted)
 # Part 3: Predictions for explanatory variables  ---------------------------------------------------------------------
 # fm1 ------------------
 # Define the dataframe as you have done already. But create a sequence of values within the range you had at your sites.
+mean.meanNDVI <- mean(fm1.covs$meanNDVI)
+mean.shrubCover <- mean(fm1.covs$shrubCover)
+mean.summer.tmax <- mean(fm1.covs$summer.tmax)
+
 # Create a sequence for each variable
-latitude <- seq(min(fm1.covs$latitude), max(fm1.covs$latitude), length = 20)
+meanNDVI <- seq(min(fm1.covs$meanNDVI), max(fm1.covs$meanNDVI), length = 119)
+shrubCover <- seq(min(fm1.covs$shrubCover), max(fm1.covs$shrubCover), length = 119)
+summer.tmax <- seq(min(fm1.covs$summer.tmax), max(fm1.covs$summer.tmax), length = 119)
 
-fm1.latitude <- data.frame(latitude = latitude)
+# Create dataframes for each variable, filling other variables with the mean values
+fm1.NDVI <- data.frame(meanNDVI = meanNDVI, shrubCover = mean.shrubCover, 
+                       summer.tmax = mean.summer.tmax, transect = fm1.covs$transect, Location = fm1.covs$Location)
 
-fm1.predict <- predict(fm1, type = "state", newdata = fm1.latitude, appendData=TRUE)
+fm1.shrubCover <- data.frame(meanNDVI = mean.meanNDVI, shrubCover = shrubCover, 
+                             summer.tmax = mean.summer.tmax, transect = fm1.covs$transect, Location = fm1.covs$Location)
+
+fm1.summer.tmax <- data.frame(meanNDVI = mean.meanNDVI, shrubCover = mean.shrubCover, 
+                              summer.tmax = summer.tmax, transect = fm1.covs$transect, Location = fm1.covs$Location)
+
+# Make predictions
+fm1.meanNDVI.predict <- predict(fm1, type = "state", newdata = fm1.NDVI, appendData=TRUE)
+fm1.shrubCover.predict <- predict(fm1, type = "state", newdata = fm1.shrubCover, appendData=TRUE)
+fm1.summer.tmax.predict <- predict(fm1, type = "state", newdata = fm1.summer.tmax, appendData=TRUE)
+
+# Create dataframes for each prediction
+fm1.meanNDVI.predict.df <- data.frame(Predicted = fm1.meanNDVI.predict$Predicted,
+                                       lower = fm1.meanNDVI.predict$lower,
+                                       upper = fm1.meanNDVI.predict$upper,
+                                       fm1.NDVI)
+fm1.shrubCover.predict.df <- data.frame(Predicted = fm1.shrubCover.predict$Predicted,
+                                      lower = fm1.shrubCover.predict$lower,
+                                      upper = fm1.shrubCover.predict$upper,
+                                      fm1.shrubCover)
+fm1.summer.tmax.predict.df <- data.frame(Predicted = fm1.summer.tmax.predict$Predicted,
+                                        lower = fm1.summer.tmax.predict$lower,
+                                        upper = fm1.summer.tmax.predict$upper,
+                                        fm1.summer.tmax)
+
 
 # Part 4: Plot results: how do the model predictors influence density?  ----------------------------------------------
-# Top model, latitude -----------
-latitude.fm1 <- ggplot(fm1.predict, aes(x=latitude, y=Predicted)) +
+# Top model, meanNDVI -----------
+meanNDVI.fm1 <- ggplot(fm1.meanNDVI.predict.df, aes(x=meanNDVI, y=Predicted)) +
   geom_line(size = 1)+
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
   theme_classic()+
-  xlab("Latitude")+
+  xlab("Mean NDVI")+
   theme(axis.title.y = element_blank())
 
-latitude.fm1
+meanNDVI.fm1
 
-# library(gridExtra)
-# library(grid)
-# png("./figures/fm1.covs.plot.png", units = "in", width = 8, height = 8, res = 300)
-# fm1.covs.plot <- grid.arrange(arrangeGrob(aspect.fm1, latitude.fm1,
-#                                           grid::nullGrob(), vegclass.fm1, grid::nullGrob(),
-#                                           layout_matrix = matrix(c(1,1,2,2,3,4,4,5), byrow = TRUE, ncol = 4),
-#                                           left = textGrob(expression(
-#                                             paste("Denisty (Pika / km" ^ "2"*")")),
-#                                                          rot = 90,  gp = gpar(fontsize = 10))))
-# dev.off()
+# Top model, shrubCover -----------
+shrubCover.fm1 <- ggplot(fm1.shrubCover.predict.df, aes(x=shrubCover, y=Predicted)) +
+  geom_line(size = 1)+
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
+  theme_classic()+
+  xlab("% Shrub Cover")+
+  theme(axis.title.y = element_blank())
+
+shrubCover.fm1
+
+# Top model, summer.tmax -----------
+summer.tmax.fm1 <- ggplot(fm1.summer.tmax.predict.df, aes(x=summer.tmax, y=Predicted)) +
+  geom_line(size = 1)+
+  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
+  theme_classic()+
+  xlab("Average Daily Summer Maximum Temperature (ºC)")+
+  theme(axis.title.y = element_blank())
+
+summer.tmax.fm1
+
+library(gridExtra)
+library(grid)
+png("./figures/fm1.covs.plot.png", units = "in", width = 8, height = 8, res = 300)
+fm1.covs.plot <- grid.arrange(arrangeGrob(meanNDVI.fm1, shrubCover.fm1,
+                                          grid::nullGrob(), summer.tmax.fm1, grid::nullGrob(),
+                                          layout_matrix = matrix(c(1,1,2,2,3,4,4,5), byrow = TRUE, ncol = 4),
+                                          left = textGrob(expression(
+                                            paste("Denisty (Pika / km" ^ "2"*")")),
+                                                         rot = 90,  gp = gpar(fontsize = 14))))
+dev.off()
 
 library(gplots)
 pdf("./figures/top.models.table.pdf", width = 22, height = 6)
@@ -104,28 +158,28 @@ library(AICcmodavg)
 avg.covs <- data.frame(latitude=transect.covs$latitude,
                        summer.pcpn.mm=transect.covs$summer.pcpn.mm,
                        summer.tmax=transect.covs$summer.tmax,
+                       meanNDVI=transect.covs$meanNDVI,
+                       shrubCover=transect.covs$shrubCover,
                        transect=transect.covs$transect,
                        Location=transect.covs$Location)
-lat <- models[[1]]
-precip <- models[[2]]
-latPrecip <- models[[3]]
-latTemp <- models[[4]]
-precipTemp <- models[[5]]
-temp <- models[[6]]
-latPrecipTemp <- models[[7]]
+NDVIshrubTemp <- models[[1]]
+NDVIshrub <- models[[2]]
+latNDVIshrub <- models[[3]]
+latNDVIshrubTemp <- models[[4]]
+NDVIshrubPrecip <- models[[5]]
+NDVIshrubPrecipTemp <- models[[6]]
 
-mods <- list(lat=lat, precip=precip, latPrecip=latPrecip, 
-             latTemp=latTemp, precipTemp=precipTemp, 
-             temp=temp, latPrecipTemp=latPrecipTemp)
+mods <- list(NDVIshrubTemp=NDVIshrubTemp, NDVIshrub=NDVIshrub, 
+             latNDVIshrub=latNDVIshrub, latNDVIshrubTemp=latNDVIshrubTemp, 
+             NDVIshrubPrecip=NDVIshrubPrecip, NDVIshrubPrecipTemp=NDVIshrubPrecipTemp)
 
 # Look at model coefficients: which models do we want to average?
-(latCI <- data.frame(coef = coef(lat, type = "state"),  CI = confint(lat, type = "state")))
-(precipCI <- data.frame(coef = coef(precip, type = "state"),  CI = confint(precip, type = "state")))
-(latPrecipCI <- data.frame(coef = coef(latPrecip, type = "state"),  CI = confint(latPrecip, type = "state")))
-(latTempCI <- data.frame(coef = coef(latTemp, type = "state"),  CI = confint(latTemp, type = "state")))
-(precipTempCI <- data.frame(coef = coef(precipTemp, type = "state"),  CI = confint(precipTemp, type = "state")))
-(tempCI <- data.frame(coef = coef(temp, type = "state"),  CI = confint(temp, type = "state")))
-(latPrecipTempCI <- data.frame(coef = coef(latPrecipTemp, type = "state"),  CI = confint(latPrecipTemp, type = "state")))
+(NDVIshrubTempCI <- data.frame(coef = coef(NDVIshrubTemp, type = "state"),  CI = confint(NDVIshrubTemp, type = "state")))
+(NDVIshrubCI <- data.frame(coef = coef(NDVIshrub, type = "state"),  CI = confint(NDVIshrub, type = "state")))
+(latNDVIshrubCI <- data.frame(coef = coef(latNDVIshrub, type = "state"),  CI = confint(latNDVIshrub, type = "state")))
+(latNDVIshrubTempCI <- data.frame(coef = coef(latNDVIshrubTemp, type = "state"),  CI = confint(latNDVIshrubTemp, type = "state")))
+(NDVIshrubPrecipCI <- data.frame(coef = coef(NDVIshrubPrecip, type = "state"),  CI = confint(NDVIshrubPrecip, type = "state")))
+(NDVIshrubPrecipTempCI <- data.frame(coef = coef(NDVIshrubPrecipTemp, type = "state"),  CI = confint(NDVIshrubPrecipTemp, type = "state")))
 
 
 Modnames <- names(mods)

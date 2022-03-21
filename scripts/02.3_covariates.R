@@ -341,10 +341,10 @@ transect.covs <- left_join(transect.covs, shrub, by = "Site")
 # Add in EVI
 evi2017 <- read.csv("./data/EVI_2017_zonalStats.csv") %>% 
   select(pikaSites_Buffer_Site, ScaledMean, ScaledSTD) %>% 
-  rename(Site=pikaSites_Buffer_Site, ScaledMean2017=ScaledMean, ScaledSTD2017=ScaledSTD)
+  rename(Site=pikaSites_Buffer_Site, EVIScaledMean2017=ScaledMean, EVIScaledSTD2017=ScaledSTD)
 evi2018 <- read.csv("./data/EVI_2018_zonalStats.csv") %>% 
   select(pikaSites_Buffer_Site, ScaledMean, ScaledSTD) %>% 
-  rename(Site=pikaSites_Buffer_Site, ScaledMean2018=ScaledMean, ScaledSTD2018=ScaledSTD)
+  rename(Site=pikaSites_Buffer_Site, EVIScaledMean2018=ScaledMean, EVIScaledSTD2018=ScaledSTD)
 
 transect.covs <- left_join(transect.covs, evi2017, by = "Site") %>% 
   left_join(evi2018, by = "Site")
@@ -352,14 +352,35 @@ transect.covs <- left_join(transect.covs, evi2017, by = "Site") %>%
 transect.covs$meanEVI <- NA
 for(i in 1:nrow(transect.covs)){
      if (transect.covs$Year[i]==2018){
-       transect.covs$meanEVI[i] =  transect.covs$ScaledMean2017[i]
+       transect.covs$meanEVI[i] =  transect.covs$EVIScaledMean2017[i]
      }else{
-        transect.covs$meanEVI[i] =  transect.covs$ScaledMean2018[i]
+        transect.covs$meanEVI[i] =  transect.covs$EVIScaledMean2018[i]
       }
 }
 
+# Add in NDVI
+ndvi2017 <- read.csv("./data/NDVI_2017_zonalStats.csv") %>% 
+  select(pikaSites_Buffer_Site, ScaledMean, ScaledSTD) %>% 
+  rename(Site=pikaSites_Buffer_Site, NDVIScaledMean2017=ScaledMean, NDVIScaledSTD2017=ScaledSTD)
+ndvi2018 <- read.csv("./data/NDVI_2018_zonalStats.csv") %>% 
+  select(pikaSites_Buffer_Site, ScaledMean, ScaledSTD) %>% 
+  rename(Site=pikaSites_Buffer_Site, NDVIScaledMean2018=ScaledMean, NDVIScaledSTD2018=ScaledSTD)
+
+transect.covs <- left_join(transect.covs, ndvi2017, by = "Site") %>% 
+  left_join(ndvi2018, by = "Site")
+
+transect.covs$meanNDVI <- NA
+for(i in 1:nrow(transect.covs)){
+  if (transect.covs$Year[i]==2018){
+    transect.covs$meanNDVI[i] =  transect.covs$NDVIScaledMean2017[i]
+  }else{
+    transect.covs$meanNDVI[i] =  transect.covs$NDVIScaledMean2018[i]
+  }
+}
+
 transect.covs <- transect.covs %>% 
-  select(-ScaledMean2017, -ScaledMean2018, -ScaledSTD2017, -ScaledSTD2018)
+  select(-EVIScaledMean2017, -EVIScaledMean2018, -EVIScaledSTD2017, -EVIScaledSTD2018,
+         -NDVIScaledMean2017, -NDVIScaledMean2018, -NDVIScaledSTD2017, -NDVIScaledSTD2018)
 
 # Part 11: Convert aspect to meaningful variables ----------------------------------
 
@@ -374,4 +395,5 @@ transect.covs <- transect.covs %>%
 # analysis. When we read in this script later, we will only have the objects that we need. 
 rm(compare.250.50, compare.250.sitesummary, compare.50.sitesummary, compare.sitesummary.250, 
    compare.sitesummary.50, compare.transect.covs.pika.tracks, dist.road, pika.tracks, site.250, 
-   site.50, trans.covs, eds.mean, path1, wx, veg.height, domVeg, lowshrub)
+   site.50, trans.covs, eds.mean, path1, wx, veg.height, domVeg, lowshrub, evi2017, evi2018,
+   ndvi2017, ndvi2018, shrub)
