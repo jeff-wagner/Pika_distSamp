@@ -378,6 +378,27 @@ for(i in 1:nrow(transect.covs)){
   }
 }
 
+# Add in NDVI with reduced cell size
+ndvi2017cell <- read.csv("./data/NDVI_2017_zonalStats_cellSize.csv") %>% 
+  select(pikaSites_Buffer_Site, ScaledMean, ScaledSTD) %>% 
+  rename(Site=pikaSites_Buffer_Site, NDVIScaledMean2017cell=ScaledMean, NDVIScaledSTD2017cell=ScaledSTD)
+ndvi2018cell <- read.csv("./data/NDVI_2018_zonalStats_cellSize.csv") %>% 
+  select(pikaSites_Buffer_Site, ScaledMean, ScaledSTD) %>% 
+  rename(Site=pikaSites_Buffer_Site, NDVIScaledMean2018cell=ScaledMean, NDVIScaledSTD2018cell=ScaledSTD)
+
+transect.covs <- left_join(transect.covs, ndvi2017cell, by = "Site") %>% 
+  left_join(ndvi2018cell, by = "Site")
+
+transect.covs$meanNDVIcell <- NA
+for(i in 1:nrow(transect.covs)){
+  if (transect.covs$Year[i]==2018){
+    transect.covs$meanNDVIcell[i] =  transect.covs$NDVIScaledMean2017cell[i]
+  }else{
+    transect.covs$meanNDVIcell[i] =  transect.covs$NDVIScaledMean2018cell[i]
+  }
+}
+
+
 transect.covs <- transect.covs %>% 
   select(-EVIScaledMean2017, -EVIScaledMean2018, -EVIScaledSTD2017, -EVIScaledSTD2018,
          -NDVIScaledMean2017, -NDVIScaledMean2018, -NDVIScaledSTD2017, -NDVIScaledSTD2018)
@@ -390,6 +411,13 @@ transect.covs$aspectRad <- transect.covs$aspect*pi/180
 # Calculate northness & eastness
 transect.covs <- transect.covs %>% 
   mutate(northness = cos(aspectRad), eastness = sin(aspectRad))
+
+# Part 12: Add in snow depth from ABoVE https://daac.ornl.gov/ABOVE/guides/Snow_Cover_Extent_and_Depth.html
+snowDepth <- read.csv("./data/snowDepth_janmar_zonalStats.csv") %>% 
+  select(pikaSites_, MEAN, STD) %>% 
+  rename(Site=pikaSites_, snowDepthMean=MEAN, snowDepthSTD=STD)
+
+transect.covs <- left_join(transect.covs, snowDepth, by = "Site")
 
 # Lastly, cleanup the environment, keeping only the objects that we will use in the final
 # analysis. When we read in this script later, we will only have the objects that we need. 

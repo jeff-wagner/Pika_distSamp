@@ -22,7 +22,7 @@ source("scripts/04_distSamp_models.r")
 # Fit a model: use your best-supported model (Lowest AICc)
 fm1 <- models[[1]] # Top model
 summary(fm1)  
-confint(fm1, type = "state") # Coefficients do not overlap 0
+confint(fm1, type = "state") # Coefficient for summer.tmax overlaps 0
 
 # Assess multicolinearity
 # vif(fm1, type = "state")
@@ -149,8 +149,8 @@ fm1.covs.plot <- grid.arrange(arrangeGrob(meanNDVI.fm1, shrubCover.fm1,
 dev.off()
 
 library(gplots)
-pdf("./figures/top.models.table.pdf", width = 22, height = 6)
-grid.table(modelList)
+pdf("./figures/top.models.table.pdf", width = 26, height = 3)
+grid.table(modelList.sub)
 dev.off()
 
 # MODEL AVERAGING ---------------------------------------------------------
