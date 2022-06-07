@@ -399,10 +399,6 @@ for(i in 1:nrow(transect.covs)){
 }
 
 
-transect.covs <- transect.covs %>% 
-  select(-EVIScaledMean2017, -EVIScaledMean2018, -EVIScaledSTD2017, -EVIScaledSTD2018,
-         -NDVIScaledMean2017, -NDVIScaledMean2018, -NDVIScaledSTD2017, -NDVIScaledSTD2018)
-
 # Part 11: Convert aspect to meaningful variables ----------------------------------
 
 # Degrees to radians
@@ -419,9 +415,15 @@ snowDepth <- read.csv("./data/snowDepth_janmar_zonalStats.csv") %>%
 
 transect.covs <- left_join(transect.covs, snowDepth, by = "Site")
 
+transect.covs <- transect.covs %>% 
+  select(-EVIScaledMean2017, -EVIScaledMean2018, -EVIScaledSTD2017, -EVIScaledSTD2018,
+         -NDVIScaledMean2017, -NDVIScaledMean2018, -NDVIScaledSTD2017, -NDVIScaledSTD2018,
+         -NDVIScaledMean2017cell, -NDVIScaledMean2018cell, -NDVIScaledSTD2017cell, -NDVIScaledSTD2018cell,
+         -snowDepthSTD)
+
 # Lastly, cleanup the environment, keeping only the objects that we will use in the final
 # analysis. When we read in this script later, we will only have the objects that we need. 
 rm(compare.250.50, compare.250.sitesummary, compare.50.sitesummary, compare.sitesummary.250, 
    compare.sitesummary.50, compare.transect.covs.pika.tracks, dist.road, pika.tracks, site.250, 
    site.50, trans.covs, eds.mean, path1, wx, veg.height, domVeg, lowshrub, evi2017, evi2018,
-   ndvi2017, ndvi2018, shrub)
+   ndvi2017, ndvi2018, shrub, ndvi2017cell, ndvi2018cell, snowDepth)

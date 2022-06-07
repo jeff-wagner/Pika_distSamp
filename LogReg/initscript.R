@@ -11,14 +11,9 @@ getwd()
 library(dplyr)
 library(data.table)
 library(tidyverse)
-library(lubridate)
-library(ggplot2)
-library(readxl)
-library(psych)
-library(sf)
-library(sp)
-library(mapview)
-library(lwgeom)
+library(jagsUI)
+library(rjags)
+library(ggmcmc)
 
 
 # Set path to Excel workbook that contains the data -----------------------------
