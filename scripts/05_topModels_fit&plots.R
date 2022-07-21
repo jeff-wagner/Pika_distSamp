@@ -13,124 +13,104 @@
 # and predicted density against model parameters.
 
 # Read in the model building script. ** Note: This may take a while to load as R has to rebuild all of the models. **
-source("scripts/04_distSamp_models_20211006.r")
+source("scripts/04_distSamp_models.r")
 
 
 # Part 1: Goodness of fit of the best performing models  --------------------------------------------------------
 ## Goodness of fit test: the model is a good fit if results of some or all of these tests show p > 0.05
 
 # Fit a model: use your best-supported model (Lowest AICc)
-fm1 <- models[[1]] # Top model
-summary(fm1)  
-confint(fm1, type = "state") # Coefficients do not overlap 0
+expMod.Selection
 
 # Assess multicolinearity
-vif(fm1, type = "state")
-fm1.covs <- data.frame(aspect=transect.covs$aspect,
-                       latitude=transect.covs$latitude,
-                       vegclass=transect.covs$vegclass,
-                       transect=transect.covs$transect,
-                       Location=transect.covs$Location)
-fm1.covs$bogus <- runif(119)
+vif(climate1, type = "state")
+climate1Covs <- data.frame(precip=transect.covs$precip,
+                           summerWarmth=transect.covs$summerWarmth)
+climate1Covs$bogus <- runif(119)
 library(car)
-m.vif <- lm(bogus ~ vegclass + scale(aspect) + scale(latitude), data = fm1.covs)
+m.vif <- lm(bogus ~ scale(precip) + scale(summerWarmth), data = climate1Covs)
 vif(m.vif)
 detach("package:car")
 
 # Function returning three fit-statistics.
-fitstats <- function(fm1) {
-  observed <- getY(fm1@data)
-  expected <- fitted(fm1)
-  resids <- residuals(fm1)
+fitstats <- function(climate1) {
+  observed <- getY(climate1@data)
+  expected <- fitted(climate1)
+  resids <- residuals(climate1)
   sse <- sum(resids^2)
   chisq <- sum((observed - expected)^2 / expected)
   freeTuke <- sum((sqrt(observed) - sqrt(expected))^2)
   out <- c(SSE=sse, Chisq=chisq, freemanTukey=freeTuke)
   return(out)
 }
-(pb.fm1 <- parboot(fm1, fitstats, nsim=500, report=1))  #Chisq shows a pretty good fit.
+(pb.climate1 <- parboot(climate1, fitstats, nsim=500, report=1))
 
 # Part 2: Predicted transect-level density estimates  --------------------------------------------------------------------
 # Use the predict function to get estimates of density (type='state' indicates you want density) using coefficients
 # from the best-supported models, combined with the covariate values for each transect.
-fm1.pred <- predict(fm1, type='state', newdata=fm1.covs, appendData=TRUE)
-summary(fm1.pred)
+climate1Pred <- predict(climate1, type='state', newdata=climate1Covs, appendData=TRUE)
+summary(climate1Pred)
 
-fm1.pred.arrange <- fm1.pred %>% 
+climate1Pred <- climate1Pred %>% 
   arrange(Predicted)
 
-hist(fm1.pred$Predicted)
+hist(climate1Pred$Predicted)
 
 # Export an excel file that you can load into ArcGIS for making a pretty map
-# write.csv(fm1.pred, file="output/fm1_density.csv")
+# write.csv(climate1Pred, file="output/climate1_density.csv")
 
 # Part 3: Predictions for explanatory variables  ---------------------------------------------------------------------
-# fm1 ------------------
+# climate1 ------------------
 # Define the dataframe as you have done already. But create a sequence of values within the range you had at your sites.
-meanaspect <- mean(fm1.covs$aspect)
-meanlatitude <- mean(fm1.covs$latitude)
+meanPrecip <- mean(climate1Covs$precip)
+meanSummerWarmth <- mean(climate1Covs$summerWarmth)
 
 
 # Create a sequence for each variable
-aspect <- seq(min(fm1.covs$aspect), max(fm1.covs$aspect), length = 119)
-latitude <- seq(min(fm1.covs$latitude), max(fm1.covs$latitude), length = 20)
-vegclass <- factor("eds", levels=c("eds","dds","dgh","lic", "ls", "ts"))
+precip <- seq(min(climate1Covs$precip), max(climate1Covs$precip), length = 119)
+summerWarmth <- seq(min(climate1Covs$summerWarmth), max(climate1Covs$summerWarmth), length = 20)
 
-fm1.aspect <- data.frame(aspect = aspect, latitude = meanlatitude, vegclass = vegclass)
-fm1.latitude <- data.frame(aspect = meanaspect, latitude = latitude, vegclass = vegclass)
-fm1.vegclass <- data.frame(aspect = meanaspect, latitude = meanlatitude, vegclass = fm1.covs$vegclass)
+climate1Precip <- data.frame(precip = precip, summerWarmth = meanSummerWarmth)
+climate1SummerWarmth <- data.frame(precip = meanPrecip, summerWarmth = summerWarmth)
 
-fm1.aspect.predict <- predict(fm1, type="state", newdata=fm1.aspect, appendData=TRUE)
-fm1.latitude.predict <- predict(fm1, type="state", newdata=fm1.latitude, appendData=TRUE)
-fm1.vegclass.predict <- predict(fm1, type="state", newdata=fm1.vegclass, appendData=TRUE)
-
+climate1PrecipPredict <- predict(climate1, type="state", newdata=climate1Precip, appendData=TRUE)
+climate1SummerWarmthPredict <- predict(climate1, type="state", newdata=climate1SummerWarmth, appendData=TRUE)
 
 # Part 4: Plot results: how do the model predictors influence density?  ----------------------------------------------
-# Top model, aspect -----------
-aspect.fm1 <- ggplot(fm1.aspect.predict, aes(x=aspect, y=Predicted)) +
-  geom_line(size = 1)+
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
-  theme_classic()+
-  xlab("Aspect (º)")+
-  theme(axis.title.y = element_blank())
+# Climate1 model, precip -----------
+plot.climate1Precip <- ggplot(climate1PrecipPredict, aes(x=precip, y=Predicted)) +
+                              geom_line(size = 1)+
+                              geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
+                              theme_classic()+
+                              xlab("Normalized mean annual precipitation")+
+                              theme(axis.title.y = element_blank())
 
-aspect.fm1
+plot.climate1Precip
 
-# Top model, latitude -----------
-latitude.fm1 <- ggplot(fm1.latitude.predict, aes(x=latitude, y=Predicted)) +
-  geom_line(size = 1)+
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
-  theme_classic()+
-  xlab("Latitude")+
-  theme(axis.title.y = element_blank())
+# Climate1 model, summer warmth -----------
+plot.climate1SummerWarmth <- ggplot(climate1SummerWarmthPredict, aes(x=summerWarmth, y=Predicted)) +
+                                    geom_line(size = 1)+
+                                    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.1)+
+                                    theme_classic()+
+                                    xlab("Normalized summer warmth index")+
+                                    theme(axis.title.y = element_blank())
 
-latitude.fm1
+plot.climate1SummerWarmth
 
-# Top model, percent summer max temp days -----------
-df <- fm1.vegclass.predict[!duplicated(fm1.vegclass.predict),]
-vegclass.fm1 <- ggplot(df, aes(x = vegclass, y=Predicted)) +
-  geom_bar(stat = "identity")+
-  geom_errorbar(aes(ymin=lower, ymax=upper), width=.2)+
-  theme_classic()+
-  xlab("Vegetation Class")+
-  theme(axis.title.y = element_blank())
-
-vegclass.fm1
-
+# Stitch plots together
 library(gridExtra)
 library(grid)
-png("./figures/fm1.covs.plot.png", units = "in", width = 8, height = 8, res = 300)
-fm1.covs.plot <- grid.arrange(arrangeGrob(aspect.fm1, latitude.fm1,
-                                          grid::nullGrob(), vegclass.fm1, grid::nullGrob(),
-                                          layout_matrix = matrix(c(1,1,2,2,3,4,4,5), byrow = TRUE, ncol = 4),
+png("./output/figures/climate1.png", units = "in", width = 8, height = 5, res = 300)
+plot.climate1 <- grid.arrange(arrangeGrob(plot.climate1Precip, plot.climate1SummerWarmth,
+                                          layout_matrix = matrix(c(1,2), byrow = TRUE, ncol = 2),
                                           left = textGrob(expression(
                                             paste("Denisty (Pika / km" ^ "2"*")")),
                                                          rot = 90,  gp = gpar(fontsize = 10))))
 dev.off()
 
 library(gplots)
-pdf("./figures/top.models.table.pdf", width = 22, height = 6)
-grid.table(modelList.sub)
+pdf("./output/figures/explanatoryModels.pdf", width = 8, height = 6)
+grid.table(expMod.Selection)
 dev.off()
 
 # MODEL AVERAGING ---------------------------------------------------------

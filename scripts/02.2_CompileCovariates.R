@@ -294,7 +294,7 @@ eds.mean <- mean(transect.covs$eds, na.rm = TRUE)
 transect.covs$eds <- replace(transect.covs$eds, is.na(transect.covs$eds), eds.mean)
 
 # Part 10: Add in other vegetation covariates -------------------------------------------------------------
-source("scripts/02.2_covs_veg.r")
+source("scripts/02.1_covs_veg.r")
 
 # Add in dominant vegetation within 50m of the talus
 transect.covs <- left_join(transect.covs, domVeg, by = "Site")

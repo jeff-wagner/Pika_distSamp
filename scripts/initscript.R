@@ -25,11 +25,8 @@ library(sf)
 library(sp)
 library(mapview)
 library(lwgeom)
-<<<<<<< Updated upstream
-=======
 library(AICcmodavg)
 library(spatialEco)
->>>>>>> Stashed changes
 
 
 # Set path to Excel workbook that contains the data -----------------------------

@@ -14,7 +14,7 @@
 
 # Read in the observation and covariate data from our data management scripts.
 source("scripts/01.1_data_mgmt_obs.r")
-source("scripts/02.3_CompileCovariates.r")
+source("scripts/02.2_CompileCovariates.r")
 
 # Part 1: Explore and cleanup the observation data  ------------------------------------------------------------
 
@@ -82,7 +82,7 @@ cor <- cor(covs.cor, use="pairwise")
 
 # Just topographic & climate
 topoCovs <- transect.covs %>% 
-  select(latitude, longitude, elevation, slope, roughness, exposure, heatload, relief, position, radiation, precip,
+  select(latitude, longitude, wetness, elevation, slope, roughness, exposure, heatload, relief, position, radiation, precip,
          summerWarmth, northness, eastness)
 topoCor <- cor(topoCovs, use = "pairwise")
 
