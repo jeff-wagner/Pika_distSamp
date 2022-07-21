@@ -14,7 +14,7 @@
 
 # Read in the observation and covariate data from our data management scripts.
 source("scripts/01.1_data_mgmt_obs.r")
-source("scripts/02.3_covariates.r")
+source("scripts/02.3_CompileCovariates.r")
 
 # Part 1: Explore and cleanup the observation data  ------------------------------------------------------------
 
@@ -41,15 +41,14 @@ hist(pika.obs.tr$perp.dist)
 summary(pika.obs.tr)
 
 # Convert character columns to factors
-pika.obs.tr$Location <- as.factor(pika.obs.tr$Location)
-pika.obs.tr$Site <- as.factor(pika.obs.tr$Site)
-pika.obs.tr$visit_type <- as.factor(pika.obs.tr$visit_type)
-pika.obs.tr$Observer <- as.factor(pika.obs.tr$Observer)
-pika.obs.tr$Species <- as.factor(pika.obs.tr$Species)
-pika.obs.tr$Obs_Type <- as.factor(pika.obs.tr$Obs_Type)
-pika.obs.tr$Audio <- as.factor(pika.obs.tr$Audio)
-pika.obs.tr$observer <- as.factor(pika.obs.tr$observer)
-pika.obs.tr$transect <- as.factor(pika.obs.tr$transect)
+colType <- sapply(pika.obs.tr, typeof)
+
+for(i in 1:length(colType)){
+  if(class(pika.obs.tr[[i]]) == "character"){
+    pika.obs.tr[[i]] <- as.factor(pika.obs.tr[[i]])
+    print(paste(colnames(pika.obs.tr[i]), "converted to factor", sep = " "))
+  }
+}
 
 # Part 2: Explore and cleanup the covariate data  -------------------------------------------------------------
 # Transect-level covariates
@@ -57,39 +56,48 @@ head(transect.covs)
 summary(transect.covs)
 
 # Convert character columns to factors
-transect.covs$Year <- as.factor(transect.covs$Year)
-transect.covs$Observer <- as.factor(transect.covs$Observer)
-transect.covs$observer <- as.factor(transect.covs$observer)
-transect.covs$transect <- as.factor(transect.covs$transect)
-transect.covs$obs1.4 <- as.factor(transect.covs$obs1.4)
-transect.covs$Site <- as.factor(transect.covs$Site)
-transect.covs$Location <- as.factor(transect.covs$Location)
-summary(transect.covs)
+
+colType <- sapply(transect.covs, typeof)
+
+for(i in 1:length(colType)){
+  if(class(transect.covs[[i]]) == "character"){
+    transect.covs[[i]] <- as.factor(transect.covs[[i]])
+    print(paste(colnames(transect.covs[i]), "converted to factor", sep = " "))
+  }
+}
 
 # Some numeric columns with NA need to be told to be numeric.
-is.numeric(transect.covs$lowshrub)
 transect.covs$lowshrub <- as.numeric(transect.covs$lowshrub)
+transect.covs$tallshrub <- as.numeric(transect.covs$tallshrub)
 
 # Check for correlations ------------------------------------------------------------------------
 # Covariates that are highly correlated should not be included in the same model
 covs.cor <- transect.covs %>% 
-  select(lowshrub, latitude, longitude, slope, aspect, elevation, tempc, windms,
-         day.of.year, eds, search.time, trans.length, start.hr, dist.road, summer.tmax, 
-         winter.tmin, percent.tmax.days, summer.pcpn.mm, winter.pcpn.mm, veg.height, lowshrub.cover)
+  select(latitude, longitude, tempc, windms, day.of.year, dist.road, lowshrub, tallshrub, talus, 
+         eds, aspect, wetness, elevation, slope, roughness, exposure, heatload, relief, position,
+         radiation, precip, summerWarmth, search.time, trans.length, start.hr, veg.height, lowshrub.cover,
+         shrubCover, northness, eastness)
 
 cor <- cor(covs.cor, use="pairwise")
+
+# Just topographic & climate
+topoCovs <- transect.covs %>% 
+  select(latitude, longitude, elevation, slope, roughness, exposure, heatload, relief, position, radiation, precip,
+         summerWarmth, northness, eastness)
+topoCor <- cor(topoCovs, use = "pairwise")
 
 # Visualize correlations: only slope and roughness are highly correlated (r=0.85)
 # Anything > 0.60 or < -0.60 we considered correlated and won't consider in same model
 library(psych)
 pairs.panels(covs.cor,ellipses = F)  
+pairs.panels(topoCor, ellipses = F)
 
 cor[which(cor > 0.6)]
 which(cor > 0.6 | cor < -0.6)
 cor[which(cor < 0.6 & cor > -0.6)] <- NA
-# It looks like lowshrub.cover & veg.height, mean.winter.temp & latitude/longitude,
-# slope & roughness, search time & trans length, and mean.winter.temp & winter.pcpn, 
-# are correlated. We need to be careful using these in the same models. 
+
+topoCor[which(topoCor < 0.6 & topoCor > -0.6)] <- NA
+
 
 # Include transects which were surveyed, but where no individuals were detected -----------------
 # Check which transects didn't produce any observations

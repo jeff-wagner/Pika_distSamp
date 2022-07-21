@@ -82,7 +82,19 @@ m13 <- distsamp(~scale(search.speed) ~scale(veg.height),
 fmList <- fitList(null=null, m1=m1, m2=m2, m3=m3, m4=m4, m5=m5, m6=m6, m7=m7, 
                   m8=m8, m9=m9, m10=m10, m11=m11, m12=m12, m13=m13)
 
+<<<<<<< Updated upstream
 modSel(fmList)
+=======
+# modSel(fmList)
+
+# AICc model selection from AICcmodavg
+fmList.AICc <- list("null"=null, "latitude"=m1, "sloper"=m2, "northness"=m3, "elevation"=m4,
+                    "dist.road"=m5, "summer.tmax"=m6, "winter.tmin"=m7, "percent.tmax.days"=m8,
+                    "summer.pcpn.mm"=m9, "winter.pcpn.mm"=m10, "eastness"=m11,
+                    "meanEVI"=m13, "meanNDVI"=m14, "meanNDVIcell"=m15, "meanSnowDepth"=m16)
+selectionTable <- aictab(fmList.AICc)
+selectionTable
+>>>>>>> Stashed changes
 
 # Part 4: Parameter Estimates – look for significance ---------------------
 summary(m11)
@@ -148,7 +160,7 @@ clust <- try(makeCluster(getOption("cl.cores", no_cores), type = clusterType))
 clusterEvalQ(clust, library(unmarked))
 clusterExport(clust, "umf")
 
-modelList <- pdredge(full, clust, rank = "AICc", extra = "adjR^2", fixed = "p(shapescale(search.speed))")
+modelList <- dredge(full, clust, rank = "AICc", extra = "adjR^2", fixed = "p(shapescale(search.speed))")
 
 par(mfrow = c(1,1), pty = "s", mai = c(0.5,0.2,3,0.2))
 plot(modelList)

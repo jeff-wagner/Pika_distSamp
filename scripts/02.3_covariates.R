@@ -335,8 +335,29 @@ transect.covs <- left_join(transect.covs, lowshrub, by = "Site")
 # Add in total shrub cover within plot
 
 
+# Part 11: Add in snow depth from ABoVE https://daac.ornl.gov/ABOVE/guides/Snow_Cover_Extent_and_Depth.html --------------
+snowDepth <- read.csv("./data/snowDepth_janmar_zonalStats.csv") %>% 
+  select(pikaSites_, MEAN, STD) %>% 
+  rename(Site=pikaSites_, snowDepthMean=MEAN, snowDepthSTD=STD)
 
-# Part 11: Convert aspect to meaningful variables ----------------------------------
+transect.covs <- left_join(transect.covs, snowDepth, by = "Site")
+
+# Part 12: Add in extracted topographic and climate variables from AK-Veg scripts ----------------
+# Define data folder
+data_folder = paste(getwd(),
+                    'data',
+                    sep ='/')
+
+sites_extracted = read.csv(paste(data_folder, "sites_extracted.csv", sep = "/"))
+sites_extracted <- sites_extracted %>% 
+  select(Site, aspect, wetness, elevation, slope, roughness, exposure, 
+         heatload, relief, position, radiation, precip, summerWarmth)
+
+transect.covs <- transect.covs %>%
+  rename(aspect.old = aspect, elevation.old = elevation, slope.old = slope) %>% 
+  left_join(transect.covs, sites_extracted, by = "Site")
+
+# Part 13: Convert aspect to meaningful variables ----------------------------------
 
 # Degrees to radians
 transect.covs$aspectRad <- transect.covs$aspect*pi/180
@@ -345,6 +366,15 @@ transect.covs$aspectRad <- transect.covs$aspect*pi/180
 transect.covs <- transect.covs %>% 
   mutate(northness = cos(aspectRad), eastness = sin(aspectRad))
 
+<<<<<<< Updated upstream
+=======
+transect.covs <- transect.covs %>% 
+  select(-EVIScaledMean2017, -EVIScaledMean2018, -EVIScaledSTD2017, -EVIScaledSTD2018,
+         -NDVIScaledMean2017, -NDVIScaledMean2018, -NDVIScaledSTD2017, -NDVIScaledSTD2018,
+         -NDVIScaledMean2017cell, -NDVIScaledMean2018cell, -NDVIScaledSTD2017cell, -NDVIScaledSTD2018cell,
+         -snowDepthSTD)
+
+>>>>>>> Stashed changes
 # Lastly, cleanup the environment, keeping only the objects that we will use in the final
 # analysis. When we read in this script later, we will only have the objects that we need. 
 rm(compare.250.50, compare.250.sitesummary, compare.50.sitesummary, compare.sitesummary.250, 
