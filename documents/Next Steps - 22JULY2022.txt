@@ -1,0 +1,3 @@
+Productivity model:
+-Substitute jan min temp instead of logs.
+-Add ndvi.

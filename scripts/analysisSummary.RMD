@@ -1,0 +1,78 @@
+---
+title: "Collared Pika Distance Sampling Analysis"
+author: "Jeff Wagner"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+```{r echo=FALSE, results='hide', message=FALSE}
+# Load packages -----------------------------------------------------------------
+
+library(dplyr)
+library(data.table)
+library(tidyverse)
+library(unmarked)
+library(lubridate)
+library(ggplot2)
+library(readxl)
+library(psych)
+library(snotelr)
+library(sf)
+library(sp)
+library(mapview)
+library(lwgeom)
+library(AICcmodavg)
+library(spatialEco)
+load("C:/Users/jeffw/OneDrive/Documents/GitHub/Pika_distSamp/output/05_Environment.RData")
+```
+
+This is a breakdown of an analysis of collared pika *(Ochotona collaris)* data collected by the Alaska Center for Conservation Science in 2018-2019. The data was collected following a spatially-explicit distance sampling approach (Royle et al. 2004). Analysis was conducted in Program R (version 4.2.0) with package *unmarked* (version 1.2.5) and predictors were compiled via an ArcGIS Pro Python installation (version 3.6+).
+
+### **Top Model Set:**
+```{r echo=FALSE}
+knitr::kable(expMod.Selection, caption = "AICc model selection table",
+             col.names = c("Model", "K", "AICc", "Delta AICc", "Model Likelihood", "AICc Weight", 
+                           "Log Likelihood", "Cumulative Weight"))
+```
+
+### *Climate & Productivity Model*
+##### Summary and Parameter Estimates
+```{r echo=FALSE}
+summary(climateProductivity)
+confint(climateProductivity, type = "state")
+```
+
+##### Plot
+```{r echo=FALSE, message=FALSE, dpi=300}
+library(gridExtra)
+library(grid)
+
+plot.climateProductivity <- grid.arrange(arrangeGrob(plot.climateProductivityPrecip, plot.climateProductivitySummerWarmth,
+                                         plot.climateProductivityLogs, plot.climateProductivityWetness,
+                                         layout_matrix = matrix(c(1,2,3,4), byrow = TRUE, ncol = 2),
+                                         left = textGrob(expression(
+                                           paste("Denisty (Pika / km" ^ "2"*")")),
+                                           rot = 90,  gp = gpar(fontsize = 10))))
+```
+
+### *Climate Model*
+##### Summary and Parameter Estimates
+```{r echo=FALSE}
+summary(climate)
+confint(climate, type = "state")
+```
+
+##### Plot
+```{r echo=FALSE, message=FALSE,dpi=300}
+library(gridExtra)
+library(grid)
+
+plot.climate <- grid.arrange(arrangeGrob(plot.climatePrecip, plot.climateSummerWarmth,
+                                         grid::nullGrob(), plot.climateJanuaryMinTemp, grid::nullGrob(),
+                                          layout_matrix = matrix(c(1,1,2,2,3,4,4,5), byrow = TRUE, ncol = 4),
+                                          left = textGrob(expression(
+                                            paste("Denisty (Pika / km" ^ "2"*")")),
+                                                         rot = 90,  gp = gpar(fontsize = 10))))
+```

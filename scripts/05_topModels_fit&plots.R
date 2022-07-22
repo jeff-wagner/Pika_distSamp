@@ -37,17 +37,17 @@ vif(vif.climateProductivity)
 detach("package:car")
 
 # Function returning three fit-statistics.
-fitstats <- function(climateProductivity) {
-  observed <- getY(climateProductivity@data)
-  expected <- fitted(climateProductivity)
-  resids <- residuals(climateProductivity)
-  sse <- sum(resids^2)
-  chisq <- sum((observed - expected)^2 / expected)
-  freeTuke <- sum((sqrt(observed) - sqrt(expected))^2)
-  out <- c(SSE=sse, Chisq=chisq, freemanTukey=freeTuke)
-  return(out)
-}
-(pb.climateProductivity <- parboot(climateProductivity, fitstats, nsim=500, report=1))
+# fitstats <- function(climateProductivity) {
+#   observed <- getY(climateProductivity@data)
+#   expected <- fitted(climateProductivity)
+#   resids <- residuals(climateProductivity)
+#   sse <- sum(resids^2)
+#   chisq <- sum((observed - expected)^2 / expected)
+#   freeTuke <- sum((sqrt(observed) - sqrt(expected))^2)
+#   out <- c(SSE=sse, Chisq=chisq, freemanTukey=freeTuke)
+#   return(out)
+# }
+# (pb.climateProductivity <- parboot(climateProductivity, fitstats, nsim=500, report=1))
 
 ## Second best model - Climate
 # Assess multicolinearity
@@ -62,17 +62,17 @@ vif(vif.climate)
 detach("package:car")
 
 # Function returning three fit-statistics.
-fitstats <- function(climate) {
-  observed <- getY(climate@data)
-  expected <- fitted(climate)
-  resids <- residuals(climate)
-  sse <- sum(resids^2)
-  chisq <- sum((observed - expected)^2 / expected)
-  freeTuke <- sum((sqrt(observed) - sqrt(expected))^2)
-  out <- c(SSE=sse, Chisq=chisq, freemanTukey=freeTuke)
-  return(out)
-}
-(pb.climate <- parboot(climate, fitstats, nsim=500, report=1))
+# fitstats <- function(climate) {
+#   observed <- getY(climate@data)
+#   expected <- fitted(climate)
+#   resids <- residuals(climate)
+#   sse <- sum(resids^2)
+#   chisq <- sum((observed - expected)^2 / expected)
+#   freeTuke <- sum((sqrt(observed) - sqrt(expected))^2)
+#   out <- c(SSE=sse, Chisq=chisq, freemanTukey=freeTuke)
+#   return(out)
+# }
+# (pb.climate <- parboot(climate, fitstats, nsim=500, report=1))
 
 # Part 2: Predicted transect-level density estimates  --------------------------------------------------------------------
 # Use the predict function to get estimates of density (type='state' indicates you want density) using coefficients from the best-supported models, combined with the covariate values for each transect.
@@ -193,7 +193,7 @@ plot.climateProductivityWetness
 library(gridExtra)
 library(grid)
 png("./output/figures/climateProductivity.png", units = "in", width = 8, height = 8, res = 300)
-plot.climate <- grid.arrange(arrangeGrob(plot.climateProductivityPrecip, plot.climateProductivitySummerWarmth,
+plot.climateProductivity <- grid.arrange(arrangeGrob(plot.climateProductivityPrecip, plot.climateProductivitySummerWarmth,
                                          plot.climateProductivityLogs, plot.climateProductivityWetness,
                                          layout_matrix = matrix(c(1,2,3,4), byrow = TRUE, ncol = 2),
                                          left = textGrob(expression(

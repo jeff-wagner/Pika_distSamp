@@ -96,7 +96,8 @@ cor[which(cor > 0.6)]
 which(cor > 0.6 | cor < -0.6)
 cor[which(cor < 0.6 & cor > -0.6)] <- NA
 
-topoCor[which(topoCor < 0.6 & topoCor > -0.6)] <- NA
+topoCor60 <- topoCor
+topoCor60[which(topoCor60 < 0.6 & topoCor60 > -0.6)] <- NA
 
 
 # Include transects which were surveyed, but where no individuals were detected -----------------

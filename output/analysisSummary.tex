@@ -1,0 +1,277 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Collared Pika Distance Sampling Analysis},
+  pdfauthor={Jeff Wagner},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Collared Pika Distance Sampling Analysis}
+\author{Jeff Wagner}
+\date{}
+
+\begin{document}
+\maketitle
+
+This is a breakdown of an analysis of collared pika \emph{(Ochotona
+collaris)} data collected by the Alaska Center for Conservation Science
+in 2018-2019. The data was collected following a spatially-explicit
+distance sampling approach (Royle et al.~2004). Analysis was conducted
+in Program R (version 4.2.0) with package \emph{unmarked} (version
+1.2.5) and predictors were compiled via an ArcGIS Pro Python
+installation (version 3.6+).
+
+\hypertarget{top-model-set}{%
+\subsubsection{\texorpdfstring{\textbf{Top Model
+Set:}}{Top Model Set:}}\label{top-model-set}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0270}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.2072}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0270}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0811}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.0991}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1532}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1081}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1351}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 16\tabcolsep) * \real{0.1622}}@{}}
+\caption{AICc model selection table}\tabularnewline
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+K
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+AICc
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Delta AICc
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Model Likelihood
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+AICc Weight
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Log Likelihood
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Cumulative Weight
+\end{minipage} \\
+\midrule
+\endfirsthead
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Model
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+K
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+AICc
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Delta AICc
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Model Likelihood
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+AICc Weight
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Log Likelihood
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Cumulative Weight
+\end{minipage} \\
+\midrule
+\endhead
+6 & climate \& productivity & 8 & 717.5533 & 0.000000 & 1.0000000 &
+0.5530377 & -350.1221 & 0.5530377 \\
+2 & climate & 7 & 718.1131 & 0.559722 & 0.7558888 & 0.4180350 &
+-351.5520 & 0.9710726 \\
+4 & climate \& topography & 10 & 724.1778 & 6.624476 & 0.0364345 &
+0.0201497 & -351.0704 & 0.9912223 \\
+5 & productivity & 6 & 726.6358 & 9.082469 & 0.0106602 & 0.0058955 &
+-356.9429 & 0.9971178 \\
+1 & null & 4 & 728.3336 & 10.780211 & 0.0045615 & 0.0025227 & -359.9913
+& 0.9996405 \\
+3 & topography & 7 & 732.2302 & 14.676900 & 0.0006501 & 0.0003595 &
+-358.6106 & 1.0000000 \\
+\bottomrule
+\end{longtable}
+
+\hypertarget{climate-productivity-model}{%
+\subsubsection{\texorpdfstring{\emph{Climate \& Productivity
+Model}}{Climate \& Productivity Model}}\label{climate-productivity-model}}
+
+\hypertarget{summary-and-parameter-estimates}{%
+\subparagraph{Summary and Parameter
+Estimates}\label{summary-and-parameter-estimates}}
+
+\begin{verbatim}
+## 
+## Call:
+## distsamp(formula = ~scale(search.speed) ~ scale(precip) + scale(summerWarmth) + 
+##     scale(logs) + scale(wetness), data = umf, keyfun = "hazard", 
+##     output = "density", unitsOut = "kmsq")
+## 
+## Density (log-scale):
+##                     Estimate    SE      z  P(>|z|)
+## (Intercept)           3.3709 0.187 18.002 1.87e-72
+## scale(precip)         0.2546 0.132  1.935 5.30e-02
+## scale(summerWarmth)  -0.1125 0.131 -0.862 3.89e-01
+## scale(logs)          -0.3369 0.144 -2.341 1.92e-02
+## scale(wetness)        0.0572 0.092  0.622 5.34e-01
+## 
+## Detection (log-scale):
+##                     Estimate    SE     z  P(>|z|)
+## (Intercept)            1.807 0.302  5.99 2.13e-09
+## scale(search.speed)   -0.919 0.139 -6.60 4.08e-11
+## 
+## Hazard-rate(scale) (log-scale):
+##  Estimate    SE    z  P(>|z|)
+##     0.645 0.144 4.47 7.67e-06
+## 
+## AIC: 716.2442 
+## Number of sites: 119
+## optim convergence code: 0
+## optim iterations: 66 
+## Bootstrap iterations: 0 
+## 
+## Survey design: line-transect
+## Detection function: hazard
+## UnitsIn: m
+## UnitsOut: kmsq
+\end{verbatim}
+
+\begin{verbatim}
+##                                 0.025       0.975
+## lam(Int)                  3.003864741  3.73785253
+## lam(scale(precip))       -0.003322409  0.51251299
+## lam(scale(summerWarmth)) -0.368336709  0.14337161
+## lam(scale(logs))         -0.618936678 -0.05488722
+## lam(scale(wetness))      -0.123144545  0.23755487
+\end{verbatim}
+
+\hypertarget{plot}{%
+\subparagraph{Plot}\label{plot}}
+
+\includegraphics{analysisSummary_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\hypertarget{climate-model}{%
+\subsubsection{\texorpdfstring{\emph{Climate
+Model}}{Climate Model}}\label{climate-model}}
+
+\hypertarget{summary-and-parameter-estimates-1}{%
+\subparagraph{Summary and Parameter
+Estimates}\label{summary-and-parameter-estimates-1}}
+
+\begin{verbatim}
+## 
+## Call:
+## distsamp(formula = ~scale(search.speed) ~ scale(precip) + scale(summerWarmth) + 
+##     scale(januaryMinTemp), data = umf, keyfun = "hazard", output = "density", 
+##     unitsOut = "kmsq")
+## 
+## Density (log-scale):
+##                       Estimate     SE     z  P(>|z|)
+## (Intercept)              3.375 0.1808 18.66 9.56e-78
+## scale(precip)            0.147 0.1042  1.41 1.59e-01
+## scale(summerWarmth)     -0.314 0.1165 -2.69 7.11e-03
+## scale(januaryMinTemp)   -0.203 0.0972 -2.09 3.68e-02
+## 
+## Detection (log-scale):
+##                     Estimate    SE     z  P(>|z|)
+## (Intercept)            1.868 0.285  6.55 5.91e-11
+## scale(search.speed)   -0.875 0.131 -6.67 2.61e-11
+## 
+## Hazard-rate(scale) (log-scale):
+##  Estimate    SE    z  P(>|z|)
+##     0.668 0.143 4.68 2.93e-06
+## 
+## AIC: 717.1041 
+## Number of sites: 119
+## optim convergence code: 0
+## optim iterations: 43 
+## Bootstrap iterations: 0 
+## 
+## Survey design: line-transect
+## Detection function: hazard
+## UnitsIn: m
+## UnitsOut: kmsq
+\end{verbatim}
+
+\begin{verbatim}
+##                                  0.025       0.975
+## lam(Int)                    3.02045512  3.72922671
+## lam(scale(precip))         -0.05730811  0.35119781
+## lam(scale(summerWarmth))   -0.54211845 -0.08528593
+## lam(scale(januaryMinTemp)) -0.39341201 -0.01239293
+\end{verbatim}
+
+\hypertarget{plot-1}{%
+\subparagraph{Plot}\label{plot-1}}
+
+\includegraphics{analysisSummary_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\end{document}
