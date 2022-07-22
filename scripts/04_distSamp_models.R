@@ -54,32 +54,46 @@ detMod.Selection
 
 # Part 3: Explanatory  ---------------------------------------------------------------------------
 null <- distsamp(~scale(search.speed) ~1, umf, keyfun="hazard", output="density", unitsOut="kmsq")
-climate1 <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth), 
-                    umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
-climate2 <- distsamp(~scale(search.speed) ~scale(precip) + scale(wetness) + scale(summerWarmth) + scale(heatload), 
+climate <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth) + scale(januaryMinTemp), 
                     umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
 topography <- distsamp(~scale(search.speed) ~scale(roughness) + scale(radiation) + scale(northness), 
                        umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
-climateTopo <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth) +
+climateTopo <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth) + scale(januaryMinTemp) +
                           scale(roughness) + scale(radiation) + scale(northness), 
                         umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
+productivity <- distsamp(~scale(search.speed) ~scale(logs) + scale(wetness),
+                         umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
+climateProductivity <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth) +
+                                  scale(logs) + scale(wetness), 
+                                umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
+# global <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth) + scale(januaryMinTemp) +
+#                      scale(roughness) + scale(radiation) + scale(northness) +
+#                      scale(logs) + scale(wetness), 
+#                    umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
 
 # AICc model selection from AICcmodavg
-expMod.List <- list("null"=null, "climate1"=climate1, "climate2"=climate2, "topography"=topography, 
-                    "climateTopo"=climateTopo)
+expMod.List <- list("null"=null, 
+                    "climate"=climate, 
+                    "topography"=topography, 
+                    "climate & topography"=climateTopo,
+                    "productivity"=productivity,
+                    "climate & productivity"=climateProductivity)
 
 expMod.Selection <- aictab(expMod.List)
 expMod.Selection
 
 # Part 4: Parameter Estimates – look for significance ---------------------
-summary(climate1)
-confint(climate1, type = "state")
+summary(climateProductivity)
+confint(climateProductivity, type = "state")
 
-summary(climate2)
-confint(climate2, type = "state")
+summary(climate)
+confint(climate, type = "state")
+
+summary(productivity)
+confint(productivity, type = "state")
 
 summary(climateTopo)
 confint(climateTopo, type = "state")
 
-rm(list=setdiff(ls(), c("umf", "modelList", "modelList.sub", "models", "transect.covs")))
+#rm(list=setdiff(ls(), c("umf", "modelList", "modelList.sub", "models", "transect.covs")))
    
