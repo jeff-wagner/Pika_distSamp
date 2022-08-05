@@ -22,7 +22,8 @@ sites_extracted = read.csv(paste(data_folder, "sites_extracted.csv", sep = "/"))
 # Select columns of interest
 sites_extracted <- sites_extracted %>% 
   select(Site, random_sit, occ_status, aspect, wetness, elevation, slope, roughness, exposure,
-         heatload, relief, position, radiation, precip, summerWarmth, januaryMinTemp, logs)
+         heatload, relief, position, radiation, evi2, nbr, ndmi, ndsi, ndvi, ndwi, precip, 
+         summerWarmth, januaryMinTemp, logs)
 
 # Part 2: Load and clean up the transect-level covariates  --------------------------------------------------
 
@@ -205,7 +206,8 @@ dim(transect.covs)  #transect covs is 47 rows.
 transect.covs <- transect.covs %>% 
   gather(obs1.4, Observer, -Location, -Site, -latitude, -longitude, -Year, - tempc, -windms, -day.of.year, -dist.road,
          -lowshrub, - tallshrub, -talus, -eds, -random_sit, -occ_status,  -aspect, -wetness, -elevation, -slope,
-         -roughness, -exposure, -heatload, -relief, -position, -radiation, -precip, -summerWarmth, -januaryMinTemp, -logs) #Yep, 188 rows.
+         -roughness, -exposure, -heatload, -relief, -position, -radiation, -evi2, -nbr, -ndmi, -ndsi, -ndvi, -ndwi,
+         -precip, -summerWarmth, -januaryMinTemp, -logs) #Yep, 188 rows.
 head(transect.covs)
 dim(transect.covs)
 

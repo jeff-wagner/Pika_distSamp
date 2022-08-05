@@ -75,15 +75,15 @@ transect.covs$tallshrub <- as.numeric(transect.covs$tallshrub)
 covs.cor <- transect.covs %>% 
   select(latitude, longitude, tempc, windms, day.of.year, dist.road, lowshrub, tallshrub, talus, 
          eds, aspect, wetness, elevation, slope, roughness, exposure, heatload, relief, position,
-         radiation, precip, summerWarmth, januaryMinTemp, logs, search.time, trans.length, start.hr, veg.height, lowshrub.cover,
-         shrubCover, northness, eastness)
+         radiation, evi2, nbr, ndmi, ndsi, ndvi, ndwi, precip, summerWarmth, januaryMinTemp, logs, 
+         search.time, trans.length, start.hr, veg.height, lowshrub.cover, shrubCover, northness, eastness)
 
 cor <- cor(covs.cor, use="pairwise")
 
 # Just topographic & climate
 topoCovs <- transect.covs %>% 
-  select(latitude, longitude, wetness, elevation, slope, roughness, exposure, heatload, relief, position, radiation, precip,
-         summerWarmth, januaryMinTemp, logs, northness, eastness)
+  select(latitude, longitude, wetness, elevation, slope, roughness, exposure, heatload, relief, position, radiation, 
+         evi2, nbr, ndmi, ndsi, ndvi, ndwi, precip, summerWarmth, januaryMinTemp, logs, northness, eastness)
 topoCor <- cor(topoCovs, use = "pairwise")
 
 # Visualize correlations: only slope and roughness are highly correlated (r=0.85)

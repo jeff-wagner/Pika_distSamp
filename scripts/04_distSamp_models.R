@@ -61,10 +61,15 @@ topography <- distsamp(~scale(search.speed) ~scale(roughness) + scale(radiation)
 climateTopo <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth) + scale(januaryMinTemp) +
                           scale(roughness) + scale(radiation) + scale(northness), 
                         umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
-productivity <- distsamp(~scale(search.speed) ~scale(logs) + scale(wetness),
+productivity <- distsamp(~scale(search.speed) ~scale(logs) + scale(ndvi),
+                         umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
+productivity2 <- distsamp(~scale(search.speed) ~scale(logs) + scale(wetness),
                          umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
 climateProductivity <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth) +
-                                  scale(logs) + scale(wetness), 
+                                  scale(januaryMinTemp) + scale(ndvi), 
+                                umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
+climateProductivity2 <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth) +
+                                  scale(logs) + scale(ndvi), 
                                 umf, keyfun = "hazard", output = "density", unitsOut = "kmsq")
 # global <- distsamp(~scale(search.speed) ~scale(precip) + scale(summerWarmth) + scale(januaryMinTemp) +
 #                      scale(roughness) + scale(radiation) + scale(northness) +
@@ -77,7 +82,9 @@ expMod.List <- list("null"=null,
                     "topography"=topography, 
                     "climate & topography"=climateTopo,
                     "productivity"=productivity,
-                    "climate & productivity"=climateProductivity)
+                    "productivity w/wetness"=productivity2,
+                    "climate & productivity"=climateProductivity,
+                    "climate & productivity (w/logs)"=climateProductivity2)
 
 expMod.Selection <- aictab(expMod.List)
 expMod.Selection
@@ -85,6 +92,9 @@ expMod.Selection
 # Part 4: Parameter Estimates – look for significance ---------------------
 summary(climateProductivity)
 confint(climateProductivity, type = "state")
+
+summary(climateProductivity2)
+confint(climateProductivity2, type = "state")
 
 summary(climate)
 confint(climate, type = "state")
