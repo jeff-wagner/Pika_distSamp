@@ -353,17 +353,18 @@ modavg.AICunmarkedFitDS <-
 
 # Model-averaged estimates
 modavgEstimates <- list(
-                        'p(Intercept)' = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "(Intercept)", parm.type = "detect"),
-                        'p(search.speed)' = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(search.speed)", parm.type = "detect"),
-                        precip = modavg(cand.set = mods, modnames = modNames, parm = "scale(precip)", parm.type = "lambda"),
-                        summerWarmth = modavg(cand.set = mods, modnames = modNames, parm = "scale(summerWarmth)", parm.type = "lambda"),
-                        januaryMinTemp = modavg(cand.set = mods, modnames = modNames, parm = "scale(januaryMinTemp)", parm.type = "lambda"),
-                        ndvi = modavg(cand.set = mods, modnames = modNames, parm = "scale(ndvi)", parm.type = "lambda"),
-                        logs = modavg(cand.set = mods, modnames = modNames, parm = "scale(logs)", parm.type = "lambda"),
-                        wetness = modavg(cand.set = mods, modnames = modNames, parm = "scale(wetness)", parm.type = "lambda"),
-                        elevation = modavg(cand.set = mods, modnames = modNames, parm = "scale(elevation)", parm.type = "lambda"),
-                        roughness = modavg(cand.set = mods, modnames = modNames, parm = "scale(roughness)", parm.type = "lambda"),
-                        northness = modavg(cand.set = mods, modnames = modNames, parm = "scale(northness)", parm.type = "lambda"))
+  'p(Intercept)' = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "(Intercept)", parm.type = "detect"),
+  'p(search.speed)' = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(search.speed)", parm.type = "detect"),
+  precip = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(precip)", parm.type = "lambda"),
+  summerWarmth = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(summerWarmth)", parm.type = "lambda"),
+  januaryMinTemp = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(januaryMinTemp)", parm.type = "lambda"),
+  ndvi = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(ndvi)", parm.type = "lambda"),
+  logs = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(logs)", parm.type = "lambda"),
+  wetness = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(wetness)", parm.type = "lambda"),
+  elevation = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(elevation)", parm.type = "lambda"),
+  roughness = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(roughness)", parm.type = "lambda"),
+  northness = modavg.AICunmarkedFitDS(cand.set = mods, modnames = modNames, parm = "scale(northness)", parm.type = "lambda"))
+
 
 df.modavgEstimates <- data.frame(Parameter = names(modavgEstimates),
                                  NumMods = NA,
